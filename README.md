@@ -1,67 +1,141 @@
-# Payload Blank Template
+# newsroom-lab
 
-This template comes configured with the bare minimum to get started on anything you need.
+An experiment: can [Payload CMS](https://payloadcms.com) (3.x, on Next.js) serve as the **backoffice** for the UA Finance platform?
 
-## Quick start
+This project rebuilds a slice of that backoffice in Payload — staff and permissions, customers, subscriptions, and above all **news management** (English/Arabic articles, a SunEditor body editor, linked translations and an audit log) — on its own MongoDB, with placeholder data only. It is a proof of concept, not a production system, and it does not read from or write to any UA Finance database.
 
-This template can be deployed directly from our Cloud hosting and it will setup MongoDB and cloud S3 object storage for media.
+## What is in it
 
-## Quick Start - local setup
+- **Staff & access** — staff are the admin login. Roles carry named permissions (`edit_news`, `add_news`, …); the first staff member is made Super Admin automatically.
+- **Customers & subscriptions** — users, subscription plans, plan prices and user subscriptions.
+- **News management**
+  - Articles with tabs for content, taxonomy & tags, SEO, publishing, provenance and AI/enrichment.
+  - **English and Arabic**: each article has one language (`lang`). The two versions of a story are separate articles that share a translation group (`uuid`). A sidebar panel can create the other-language draft, link two existing articles, or unlink them; only one article per language is allowed per group.
+  - **Body editor**: the same SunEditor setup as the UA Finance backoffice (same toolbar, link `rel` rules, 30,000-character counter, RTL for Arabic), stored as an HTML string and sanitised on save (images stripped, external links get `rel="nofollow"`).
+  - **Audit log**: an append-only record of creates, edits, status changes and deletes, with before/after values for tracked fields. It is written by hooks and cannot be edited through the API.
+  - Categories, topics (with an AI-proposed → approved review flow) and hub chips.
+- **UA Finance admin theme** — colours, logo and typography ported from the existing backoffice.
 
-To spin up this template locally, follow these steps:
+## Getting started
 
-### Clone
+**Prerequisites:** Node 20+ and a MongoDB.
 
-After you click the `Deploy` button above, you'll want to have standalone copy of this repo on your machine. If you've already cloned this repo, skip to [Development](#development).
+1. **Start MongoDB.** Any Mongo works; for example with Docker:
 
-### Development
+   ```bash
+   docker run -d --name payload-mongo -p 27019:27017 mongo:7
+   ```
 
-1. First [clone the repo](#clone) if you have not done so already
-2. `cd my-project && cp .env.example .env` to copy the example environment variables. You'll need to add the `MONGODB_URL` from your Cloud project to your `.env` if you want to use S3 storage and the MongoDB database that was created for you.
+2. **Create your `.env`:**
 
-3. `pnpm install && pnpm dev` to install dependencies and start the dev server
-4. open `http://localhost:3000` to open the app in your browser
+   ```bash
+   cp .env.example .env
+   ```
 
-That's it! Changes made in `./src` will be reflected in your app. Follow the on-screen instructions to login and create your first admin user. Then check out [Production](#production) once you're ready to build and serve your app, and [Deployment](#deployment) when you're ready to go live.
+   Then set the two values:
 
-#### Docker (Optional)
+   ```env
+   DATABASE_URL=mongodb://127.0.0.1:27019/newsroom-lab
+   PAYLOAD_SECRET=any-long-random-string
+   ```
 
-If you prefer to use Docker for local development instead of a local MongoDB instance, the provided docker-compose.yml file can be used.
+3. **Install and run:**
 
-To do so, follow these steps:
+   ```bash
+   npm install
+   npm run dev
+   ```
 
-- Modify the `MONGODB_URL` in your `.env` file to `mongodb://127.0.0.1/<dbname>`
-- Modify the `docker-compose.yml` file's `MONGODB_URL` to match the above `<dbname>`
-- Run `docker-compose up` to start the database, optionally pass `-d` to run in the background.
+   Open http://localhost:3000/admin (use `npm run dev -- --port 3100` if 3000 is taken). Only one dev server can run per project at a time.
 
-## How it works
+4. **Create your admin account.** The first screen asks for email, password and name. Your role (Super Admin) and department are assigned automatically.
 
-The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:
+5. **Optional — load sample data:**
 
-### Collections
+   ```bash
+   npm run seed:news
+   ```
 
-See the [Collections](https://payloadcms.com/docs/configuration/collections) docs for details on how to extend this functionality.
+   This adds 6 categories, 8 topics, 5 hub chips and 13 placeholder articles (9 English, 4 Arabic, some linked as translations), written as your staff account so the audit log has real history. It is safe to re-run.
 
-- #### Users (Authentication)
+> The repo is set up with npm (`package-lock.json`). Some template leftovers mention pnpm (`engines`, the `test` script and `docker-compose.yml`); use the npm commands below.
 
-  Users are auth-enabled collections that have access to the admin panel.
+## Environment variables
 
-  For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/3.x/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
+| Variable | Required | Purpose |
+|---|---|---|
+| `DATABASE_URL` | yes | MongoDB connection string. |
+| `PAYLOAD_SECRET` | yes | Secret used to sign sessions. |
+| `NEXT_PUBLIC_ARTICLE_MAX_CHAR_COUNT` | no | Body character limit (default `30000`). Shared by the editor and server validation. |
+| `PUBLIC_BASE_DOMAIN` | no | Domain treated as internal when normalising article links (default `uafinances.com`). |
+| `AUDIT_LOG_AUTHORIZED_USERS_EMAILS` | no | Comma-separated emails allowed to read audit logs, in addition to Super Admins and the `view_audit_logs` permission. |
 
-- #### Media
+## Scripts
 
-  This is the uploads enabled collection. It features pre-configured sizes, focal point and manual resizing to help you manage your pictures.
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the dev server. |
+| `npm run build` / `npm start` | Production build and server. |
+| `npm run seed:news` | Load the sample news data (idempotent). |
+| `npm run generate:types` | Regenerate `src/payload-types.ts` after changing collections. |
+| `npm run generate:importmap` | Regenerate the admin import map after adding custom components. |
+| `npm run test:int` | Run the Vitest suite. |
+| `npm run lint` | ESLint. |
 
-### Docker
+To run your own one-off script against the local API, use `npx payload run path/to/script.ts` (see `scripts/seed-news.ts`).
 
-Alternatively, you can use [Docker](https://www.docker.com) to spin up this template locally. To do so, follow these steps:
+## Collections
 
-1. Follow [steps 1 and 2 from above](#development), the docker-compose file will automatically use the `.env` file in your project root
-1. Next run `docker-compose up`
-1. Follow [steps 4 and 5 from above](#development) to login and create your first admin user
+| Group | Collections |
+|---|---|
+| Staff Management | `staff` (the admin login), `roles`, `permissions`, `staff-departments` |
+| Customers | `users` (customer records — customer login is not handled here) |
+| Site Setup | `languages` |
+| Subscriptions | `products` (plans), `billing-products` (plan prices), `user-subscriptions` |
+| News | `news`, `news-categories`, `news-topics`, `news-hub-chips`, `article-audit-logs` |
+| Uploads | `media` (with 320px and 640px image sizes) |
 
-That's it! The Docker instance will help you get up and running quickly while also standardizing the development environment across your teams.
+Data is stored in the MongoDB you point `DATABASE_URL` at; each collection slug is a Mongo collection. Field names are camelCase (`mainCategory`, `scheduleTime`), which differs from the snake_case used by the existing UA Finance database.
 
-## Questions
+## Project structure
 
-If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).
+```
+src/
+  collections/          Collection configs (+ newsTranslations.ts: translation endpoints)
+  fields/articleBody/   SunEditor field, ported editor patches, HTML sanitiser, options
+  audit/                Article audit helper and hooks
+  access/               Permission and role access helpers
+  components/admin/     Admin UI: logo, audit-history link, translations panel
+  app/(payload)/        Admin, API routes and the admin theme (custom.scss)
+scripts/seed-news.ts    Sample data
+tests/int/              Vitest tests (editor patches, sanitiser, translations)
+```
+
+## How a few things work
+
+- **Permissions.** Super Admins can do everything. Other staff need a role whose permissions include the relevant names (`add_news`, `edit_news`, `delete_news`, `view_all_news`, `view_audit_logs`, and the news-category ones). They are created on first start; assign them to roles in the admin.
+- **Audit log.** Hooks on `news` diff the tracked fields on every save. Changing an article's translation group (`uuid`) — i.e. linking or unlinking a translation — is recorded too. Audit failures are logged but never block a save.
+- **Body field.** `articleBodyField()` (`src/fields/articleBody/index.ts`) is reusable for other collections. The sanitiser in `src/fields/articleBody/sanitize/` is a copy of the UA Finance API's `prepareArticleBodyHtml`; keep the two in sync if the original changes.
+
+## Tests
+
+```bash
+npm run test:int
+```
+
+49 tests cover the ported editor patches, the sanitiser and link rules, the field's validation and options, and the translation helper. The Playwright tests in `tests/e2e` are the untouched template ones and have not been updated for this project.
+
+## Not built (yet)
+
+- Scheduled publishing, push notifications, cache clearing and enrichment — the fields exist, but nothing acts on them.
+- The AI newsroom screens (RSS feeds, suggestion queue, AI audit reports) and the enrichment review screen.
+- Blog, FAQ, tickets and the other backoffice sections.
+- A public frontend that uses the translation links (for example a "read in Arabic" switch).
+- Customer authentication, billing integration and payments.
+- Visual checks of the editor in dark mode, and handling for articles already longer than the 30,000-character limit.
+
+## Notes
+
+- All article content and sample data in this repo is placeholder text.
+- The UA Finance logo and favicon in `public/` come from the company's backoffice and are used for the admin theme.
+- Built from the Payload blank template (MIT).
