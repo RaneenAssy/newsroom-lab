@@ -12,5 +12,11 @@ export const Media: CollectionConfig = {
       required: true,
     },
   ],
-  upload: true,
+  upload: {
+    // The public site serves 320/640px variants of article images.
+    imageSizes: [
+      { name: 'w320', width: 320 },
+      { name: 'w640', width: 640 },
+    ],
+  },
 }

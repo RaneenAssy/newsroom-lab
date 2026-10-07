@@ -63,11 +63,24 @@ export type SupportedTimezones =
 
 export interface Config {
   auth: {
-    users: UserAuthOperations;
+    staff: StaffAuthOperations;
   };
   blocks: {};
   collections: {
+    staff: Staff;
+    roles: Role;
+    permissions: Permission;
+    'staff-departments': StaffDepartment;
     users: User;
+    languages: Language;
+    products: Product;
+    'billing-products': BillingProduct;
+    'user-subscriptions': UserSubscription;
+    news: News;
+    'news-categories': NewsCategory;
+    'news-topics': NewsTopic;
+    'news-hub-chips': NewsHubChip;
+    'article-audit-logs': ArticleAuditLog;
     media: Media;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -76,7 +89,20 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
+    staff: StaffSelect<false> | StaffSelect<true>;
+    roles: RolesSelect<false> | RolesSelect<true>;
+    permissions: PermissionsSelect<false> | PermissionsSelect<true>;
+    'staff-departments': StaffDepartmentsSelect<false> | StaffDepartmentsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    languages: LanguagesSelect<false> | LanguagesSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    'billing-products': BillingProductsSelect<false> | BillingProductsSelect<true>;
+    'user-subscriptions': UserSubscriptionsSelect<false> | UserSubscriptionsSelect<true>;
+    news: NewsSelect<false> | NewsSelect<true>;
+    'news-categories': NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
+    'news-topics': NewsTopicsSelect<false> | NewsTopicsSelect<true>;
+    'news-hub-chips': NewsHubChipsSelect<false> | NewsHubChipsSelect<true>;
+    'article-audit-logs': ArticleAuditLogsSelect<false> | ArticleAuditLogsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -93,13 +119,13 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User;
+  user: Staff;
   jobs: {
     tasks: unknown;
     workflows: unknown;
   };
 }
-export interface UserAuthOperations {
+export interface StaffAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -119,10 +145,32 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "staff".
  */
-export interface User {
+export interface Staff {
   id: string;
+  name: string;
+  nameAr?: string | null;
+  /**
+   * Required. Assigned automatically to the first staff member (Super Admin).
+   */
+  role?: (string | null) | Role;
+  /**
+   * Required. Assigned automatically to the first staff member (Management).
+   */
+  staffDepartment?: (string | null) | StaffDepartment;
+  status?: boolean | null;
+  active?: boolean | null;
+  isPublisherAuthor?: boolean | null;
+  profileImg?: (string | null) | Media;
+  slug?: string | null;
+  jobTitleEn?: string | null;
+  jobTitleAr?: string | null;
+  bioEn?: string | null;
+  bioAr?: string | null;
+  publicEmail?: string | null;
+  linkedinUrl?: string | null;
+  xUrl?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -130,6 +178,7 @@ export interface User {
   resetPasswordExpiration?: string | null;
   salt?: string | null;
   hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
   sessions?:
@@ -140,7 +189,47 @@ export interface User {
       }[]
     | null;
   password?: string | null;
-  collection: 'users';
+  collection: 'staff';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "roles".
+ */
+export interface Role {
+  id: string;
+  name: string;
+  permissions?: (string | Permission)[] | null;
+  status?: boolean | null;
+  /**
+   * All-access role. Only set by the seed script.
+   */
+  isSuperAdmin?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "permissions".
+ */
+export interface Permission {
+  id: string;
+  name: string;
+  section: string;
+  status?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "staff-departments".
+ */
+export interface StaffDepartment {
+  id: string;
+  name: string;
+  description?: string | null;
+  status?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -160,6 +249,490 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+  sizes?: {
+    w320?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    w640?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  country?: string | null;
+  profileImage?: (string | null) | Media;
+  status?: boolean | null;
+  active?: boolean | null;
+  isVerified?: boolean | null;
+  language?: ('en' | 'ar') | null;
+  isAgreed?: ('yes' | 'no') | null;
+  /**
+   * Set at registration; read-only afterwards.
+   */
+  signupSource?: ('web' | 'ios' | 'android' | 'unknown') | null;
+  isSubscribed?: boolean | null;
+  isPaidPackage?: boolean | null;
+  currentPackage?: (string | null) | Product;
+  subscriptionExpiry?: string | null;
+  notificationPreferences?: {
+    news?: {
+      enabled?: boolean | null;
+    };
+    blogs?: {
+      enabled?: boolean | null;
+    };
+    academy?: {
+      enabled?: boolean | null;
+    };
+  };
+  twoFactorEnabled?: boolean | null;
+  lastLogin?: string | null;
+  ipAddress?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: string;
+  name: string;
+  description?: string | null;
+  interval: 'month' | 'year';
+  subscriptionType: 'free' | 'paid';
+  /**
+   * 0 means all.
+   */
+  topN?: number | null;
+  status?: boolean | null;
+  isSubscriptionBased?: boolean | null;
+  features?:
+    | {
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  havingAssetsClass?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "languages".
+ */
+export interface Language {
+  id: string;
+  name: string;
+  code: string;
+  appLangCode: string;
+  rtl?: boolean | null;
+  flagImg?: (string | null) | Media;
+  status?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * One price per plan + interval + currency + country.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "billing-products".
+ */
+export interface BillingProduct {
+  id: string;
+  product: string | Product;
+  name: string;
+  interval: 'month' | 'year';
+  /**
+   * ISO 4217, e.g. AED
+   */
+  currency: string;
+  /**
+   * ISO 3166-1 alpha-2, e.g. AE
+   */
+  country: string;
+  /**
+   * Pre-tax amount.
+   */
+  amount: number;
+  /**
+   * Decimal, e.g. 0.05
+   */
+  vatRate: number;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-subscriptions".
+ */
+export interface UserSubscription {
+  id: string;
+  user: string | User;
+  product: string | Product;
+  environment: 'test' | 'live';
+  interval: 'month' | 'year';
+  country: string;
+  vatRate?: number | null;
+  startDate: string;
+  endDate: string;
+  billingPeriodAnchor: string;
+  lifecycleState?: ('active' | 'past_due' | 'cancelled' | 'lapsed' | 'superseded' | 'refunded') | null;
+  billingStatus?: ('success' | 'renewed' | 'past_due' | 'failed' | 'cancelled' | 'refunded') | null;
+  accessRevokedAt?: string | null;
+  accessEndsAt?: string | null;
+  supersededAt?: string | null;
+  supersededBy?: (string | null) | UserSubscription;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news".
+ */
+export interface News {
+  id: string;
+  status: 'draft' | 'scheduled' | 'published';
+  lang: 'en' | 'ar';
+  isFeatured?: boolean | null;
+  commentsEnabled?: boolean | null;
+  /**
+   * Untick to soft-delete (kept in the database and the audit log).
+   */
+  active?: boolean | null;
+  title: string;
+  /**
+   * Generated from the title if left empty. Kept unique automatically.
+   */
+  slug?: string | null;
+  /**
+   * Article body (HTML). Max 30,000 characters of text. Images are not allowed; external links get rel="nofollow".
+   */
+  description?: string | null;
+  source?: string | null;
+  url: string;
+  canonicalUrl?: string | null;
+  urlToImage?: (string | null) | Media;
+  altText?: string | null;
+  imageSourceCredit?: string | null;
+  imageCredit?: {
+    kind?: ('ai' | 'open_source') | null;
+    tool?: ('google_gemini' | 'openai_gpt' | 'anthropic_claude' | 'xai_grok') | null;
+    author?: string | null;
+    site?: string | null;
+  };
+  tocEnabled?: boolean | null;
+  mainCategory: string | NewsCategory;
+  categories?: (string | NewsCategory)[] | null;
+  mainAuthor?: (string | null) | Staff;
+  secondaryAuthor?: (string | null) | Staff;
+  contentReviewer?: (string | null) | Staff;
+  /**
+   * Defaults to the creating staff member.
+   */
+  newsBy?: string | null;
+  createdBy?: (string | null) | Staff;
+  /**
+   * Countries the article is about.
+   */
+  countries?:
+    | {
+        code: string;
+        country: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Symbols, topics, countries etc. Machine-detected tags can be suppressed below.
+   */
+  tags?:
+    | {
+        kind: 'symbol' | 'country' | 'region' | 'sector' | 'industry' | 'topic';
+        key: string;
+        role?: ('primary' | 'mentioned') | null;
+        score?: number | null;
+        source: 'editor' | 'newsroom' | 'vendor' | 'auto' | 'derived';
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Machine tags a human rejected — never re-attached automatically.
+   */
+  suppressedTags?:
+    | {
+        kind: 'symbol' | 'country' | 'region' | 'sector' | 'industry' | 'topic';
+        key: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Concurrency token for tag writers.
+   */
+  tagsRev?: number | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  metaKeywords?: string | null;
+  keywords?: string | null;
+  industry?: string | null;
+  /**
+   * JSON-LD blocks.
+   */
+  schemaMarkup?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  scheduleTime: string;
+  /**
+   * IANA name, e.g. Asia/Dubai
+   */
+  scheduleTimezone: string;
+  publishedAt?: string | null;
+  notificationEnabled?: boolean | null;
+  customNotificationTitle?: string | null;
+  notificationPushedAt?: string | null;
+  contentOrigin?:
+    | (
+        | 'MANUAL_ORIGINAL'
+        | 'MANUAL_AI_ASSISTED'
+        | 'AI_GENERATED_EDITOR_TRIGGERED'
+        | 'AUTOMATED_DATA_BRIEF'
+        | 'TRANSLATION_MANUAL'
+        | 'TRANSLATION_AI'
+        | 'SYNDICATED_VERBATIM'
+        | 'THIRD_PARTY_SUMMARY_OR_REWRITE'
+        | 'MIXED'
+        | 'UNKNOWN'
+      )
+    | null;
+  productionWorkflow?: string | null;
+  editorNotes?: string | null;
+  /**
+   * Sources an editor recorded by hand.
+   */
+  declaredSources?:
+    | {
+        url: string;
+        publisher?: string | null;
+        title?: string | null;
+        publishedAt?: string | null;
+        tier?: number | null;
+        quote?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  licensing?: {
+    status?:
+      | ('NOT_APPLICABLE' | 'VERIFIED_PERMITTED' | 'VERIFIED_PERMITTED_WITH_CONDITIONS' | 'UNKNOWN' | 'PROHIBITED')
+      | null;
+    vendor?: string | null;
+    termsSummary?: string | null;
+    attributionText?: string | null;
+    permissions?:
+      | (
+          | 'verbatim_republication'
+          | 'summarization'
+          | 'adaptation'
+          | 'rewriting'
+          | 'translation'
+          | 'headline_reuse'
+          | 'quotation'
+          | 'images'
+          | 'charts'
+          | 'search_indexing'
+          | 'google_news'
+          | 'monetization'
+          | 'storage_retention'
+        )[]
+      | null;
+    geoRestrictions?: string[] | null;
+    verifiedBy?: (string | null) | Staff;
+    verifiedAt?: string | null;
+  };
+  indexing?: {
+    intent?: ('INDEX' | 'NOINDEX_SYNDICATED' | 'NOINDEX_DERIVATIVE' | 'NOINDEX_TEMPORARY') | null;
+    googlebot?: ('index' | 'noindex') | null;
+    googlebotNews?: ('index' | 'noindex') | null;
+    reason?: string | null;
+    decidedBy?: (string | null) | Staff;
+    decidedAt?: string | null;
+  };
+  editorialReview?: {
+    reviewer?: (string | null) | Staff;
+    reviewedAt?: string | null;
+    notes?: string | null;
+  };
+  sponsored?: {
+    isSponsored?: boolean | null;
+    advertiser?: string | null;
+    disclosureText?: string | null;
+  };
+  /**
+   * Edits worth telling readers about. Only substantive ones advance the public modified date.
+   */
+  updateHistory?:
+    | {
+        at: string;
+        by?: (string | null) | Staff;
+        substantive?: boolean | null;
+        summary?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  lastSubstantiveUpdateAt?: string | null;
+  postEnrichmentStatus?: ('enriching' | 'enriched' | 'partially_enriched' | 'error') | null;
+  enrichmentStartedAt?: string | null;
+  /**
+   * Set by the AI newsroom. `humanEdited` flips automatically on the first staff save.
+   */
+  aiOrigin?: {
+    generated?: boolean | null;
+    humanEdited?: boolean | null;
+    verificationBlockingClaims?: number | null;
+    provider?: string | null;
+    model?: string | null;
+    promptVersion?: string | null;
+    costUsd?: number | null;
+    generatedAt?: string | null;
+    sourceCredits?:
+      | {
+          publisher: string;
+          publisherAr?: string | null;
+          title?: string | null;
+          publishedAt?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Shared by an article and its other-language version. Use the Translations panel to link or unlink.
+   */
+  uuid?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news-categories".
+ */
+export interface NewsCategory {
+  id: string;
+  name: string;
+  nameAr?: string | null;
+  slug: string;
+  status?: boolean | null;
+  defaultCategory?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news-topics".
+ */
+export interface NewsTopic {
+  id: string;
+  name: string;
+  nameAr?: string | null;
+  slug: string;
+  /**
+   * Visible to readers.
+   */
+  status?: boolean | null;
+  reviewStatus?: ('approved' | 'pending') | null;
+  origin?: ('editor' | 'newsroom') | null;
+  /**
+   * Why no existing topic fitted.
+   */
+  proposedReason?: string | null;
+  approvedBy?: (string | null) | Staff;
+  approvedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news-hub-chips".
+ */
+export interface NewsHubChip {
+  id: string;
+  chipKind: 'tier' | 'topic';
+  /**
+   * Tier kind (e.g. country) or topic slug (e.g. earnings).
+   */
+  key: string;
+  /**
+   * Hidden chips lose their tab only.
+   */
+  visible?: boolean | null;
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Read-only history of changes to articles. Filter by article ID to see a single article’s history.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "article-audit-logs".
+ */
+export interface ArticleAuditLog {
+  id: string;
+  articleType: 'news' | 'blog';
+  action: 'CREATE' | 'EDIT' | 'DELETE' | 'CHANGE_STATUS' | 'ENRICH' | 'ENRICH.EDIT' | 'ENRICH.DECLINE' | 'RE-ENRICH';
+  articleLang?: string | null;
+  articleId: string;
+  /**
+   * Title at the time of the change.
+   */
+  articleTitle?: string | null;
+  articleSlug?: string | null;
+  actionBy?: (string | null) | Staff;
+  isSystemAction?: boolean | null;
+  /**
+   * Before / after values for each tracked field that changed.
+   */
+  changedFields?:
+    | {
+        field: string;
+        before?: string | null;
+        after?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -186,8 +759,60 @@ export interface PayloadLockedDocument {
   id: string;
   document?:
     | ({
+        relationTo: 'staff';
+        value: string | Staff;
+      } | null)
+    | ({
+        relationTo: 'roles';
+        value: string | Role;
+      } | null)
+    | ({
+        relationTo: 'permissions';
+        value: string | Permission;
+      } | null)
+    | ({
+        relationTo: 'staff-departments';
+        value: string | StaffDepartment;
+      } | null)
+    | ({
         relationTo: 'users';
         value: string | User;
+      } | null)
+    | ({
+        relationTo: 'languages';
+        value: string | Language;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: string | Product;
+      } | null)
+    | ({
+        relationTo: 'billing-products';
+        value: string | BillingProduct;
+      } | null)
+    | ({
+        relationTo: 'user-subscriptions';
+        value: string | UserSubscription;
+      } | null)
+    | ({
+        relationTo: 'news';
+        value: string | News;
+      } | null)
+    | ({
+        relationTo: 'news-categories';
+        value: string | NewsCategory;
+      } | null)
+    | ({
+        relationTo: 'news-topics';
+        value: string | NewsTopic;
+      } | null)
+    | ({
+        relationTo: 'news-hub-chips';
+        value: string | NewsHubChip;
+      } | null)
+    | ({
+        relationTo: 'article-audit-logs';
+        value: string | ArticleAuditLog;
       } | null)
     | ({
         relationTo: 'media';
@@ -195,8 +820,8 @@ export interface PayloadLockedDocument {
       } | null);
   globalSlug?: string | null;
   user: {
-    relationTo: 'users';
-    value: string | User;
+    relationTo: 'staff';
+    value: string | Staff;
   };
   updatedAt: string;
   createdAt: string;
@@ -208,8 +833,8 @@ export interface PayloadLockedDocument {
 export interface PayloadPreference {
   id: string;
   user: {
-    relationTo: 'users';
-    value: string | User;
+    relationTo: 'staff';
+    value: string | Staff;
   };
   key?: string | null;
   value?:
@@ -237,9 +862,25 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "staff_select".
  */
-export interface UsersSelect<T extends boolean = true> {
+export interface StaffSelect<T extends boolean = true> {
+  name?: T;
+  nameAr?: T;
+  role?: T;
+  staffDepartment?: T;
+  status?: T;
+  active?: T;
+  isPublisherAuthor?: T;
+  profileImg?: T;
+  slug?: T;
+  jobTitleEn?: T;
+  jobTitleAr?: T;
+  bioEn?: T;
+  bioAr?: T;
+  publicEmail?: T;
+  linkedinUrl?: T;
+  xUrl?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -247,6 +888,7 @@ export interface UsersSelect<T extends boolean = true> {
   resetPasswordExpiration?: T;
   salt?: T;
   hash?: T;
+  resetPasswordRequestedAt?: T;
   loginAttempts?: T;
   lockUntil?: T;
   sessions?:
@@ -256,6 +898,387 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "roles_select".
+ */
+export interface RolesSelect<T extends boolean = true> {
+  name?: T;
+  permissions?: T;
+  status?: T;
+  isSuperAdmin?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "permissions_select".
+ */
+export interface PermissionsSelect<T extends boolean = true> {
+  name?: T;
+  section?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "staff-departments_select".
+ */
+export interface StaffDepartmentsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  email?: T;
+  phone?: T;
+  country?: T;
+  profileImage?: T;
+  status?: T;
+  active?: T;
+  isVerified?: T;
+  language?: T;
+  isAgreed?: T;
+  signupSource?: T;
+  isSubscribed?: T;
+  isPaidPackage?: T;
+  currentPackage?: T;
+  subscriptionExpiry?: T;
+  notificationPreferences?:
+    | T
+    | {
+        news?:
+          | T
+          | {
+              enabled?: T;
+            };
+        blogs?:
+          | T
+          | {
+              enabled?: T;
+            };
+        academy?:
+          | T
+          | {
+              enabled?: T;
+            };
+      };
+  twoFactorEnabled?: T;
+  lastLogin?: T;
+  ipAddress?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "languages_select".
+ */
+export interface LanguagesSelect<T extends boolean = true> {
+  name?: T;
+  code?: T;
+  appLangCode?: T;
+  rtl?: T;
+  flagImg?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  interval?: T;
+  subscriptionType?: T;
+  topN?: T;
+  status?: T;
+  isSubscriptionBased?: T;
+  features?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  havingAssetsClass?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "billing-products_select".
+ */
+export interface BillingProductsSelect<T extends boolean = true> {
+  product?: T;
+  name?: T;
+  interval?: T;
+  currency?: T;
+  country?: T;
+  amount?: T;
+  vatRate?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-subscriptions_select".
+ */
+export interface UserSubscriptionsSelect<T extends boolean = true> {
+  user?: T;
+  product?: T;
+  environment?: T;
+  interval?: T;
+  country?: T;
+  vatRate?: T;
+  startDate?: T;
+  endDate?: T;
+  billingPeriodAnchor?: T;
+  lifecycleState?: T;
+  billingStatus?: T;
+  accessRevokedAt?: T;
+  accessEndsAt?: T;
+  supersededAt?: T;
+  supersededBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news_select".
+ */
+export interface NewsSelect<T extends boolean = true> {
+  status?: T;
+  lang?: T;
+  isFeatured?: T;
+  commentsEnabled?: T;
+  active?: T;
+  title?: T;
+  slug?: T;
+  description?: T;
+  source?: T;
+  url?: T;
+  canonicalUrl?: T;
+  urlToImage?: T;
+  altText?: T;
+  imageSourceCredit?: T;
+  imageCredit?:
+    | T
+    | {
+        kind?: T;
+        tool?: T;
+        author?: T;
+        site?: T;
+      };
+  tocEnabled?: T;
+  mainCategory?: T;
+  categories?: T;
+  mainAuthor?: T;
+  secondaryAuthor?: T;
+  contentReviewer?: T;
+  newsBy?: T;
+  createdBy?: T;
+  countries?:
+    | T
+    | {
+        code?: T;
+        country?: T;
+        id?: T;
+      };
+  tags?:
+    | T
+    | {
+        kind?: T;
+        key?: T;
+        role?: T;
+        score?: T;
+        source?: T;
+        id?: T;
+      };
+  suppressedTags?:
+    | T
+    | {
+        kind?: T;
+        key?: T;
+        id?: T;
+      };
+  tagsRev?: T;
+  metaTitle?: T;
+  metaDescription?: T;
+  metaKeywords?: T;
+  keywords?: T;
+  industry?: T;
+  schemaMarkup?: T;
+  scheduleTime?: T;
+  scheduleTimezone?: T;
+  publishedAt?: T;
+  notificationEnabled?: T;
+  customNotificationTitle?: T;
+  notificationPushedAt?: T;
+  contentOrigin?: T;
+  productionWorkflow?: T;
+  editorNotes?: T;
+  declaredSources?:
+    | T
+    | {
+        url?: T;
+        publisher?: T;
+        title?: T;
+        publishedAt?: T;
+        tier?: T;
+        quote?: T;
+        id?: T;
+      };
+  licensing?:
+    | T
+    | {
+        status?: T;
+        vendor?: T;
+        termsSummary?: T;
+        attributionText?: T;
+        permissions?: T;
+        geoRestrictions?: T;
+        verifiedBy?: T;
+        verifiedAt?: T;
+      };
+  indexing?:
+    | T
+    | {
+        intent?: T;
+        googlebot?: T;
+        googlebotNews?: T;
+        reason?: T;
+        decidedBy?: T;
+        decidedAt?: T;
+      };
+  editorialReview?:
+    | T
+    | {
+        reviewer?: T;
+        reviewedAt?: T;
+        notes?: T;
+      };
+  sponsored?:
+    | T
+    | {
+        isSponsored?: T;
+        advertiser?: T;
+        disclosureText?: T;
+      };
+  updateHistory?:
+    | T
+    | {
+        at?: T;
+        by?: T;
+        substantive?: T;
+        summary?: T;
+        id?: T;
+      };
+  lastSubstantiveUpdateAt?: T;
+  postEnrichmentStatus?: T;
+  enrichmentStartedAt?: T;
+  aiOrigin?:
+    | T
+    | {
+        generated?: T;
+        humanEdited?: T;
+        verificationBlockingClaims?: T;
+        provider?: T;
+        model?: T;
+        promptVersion?: T;
+        costUsd?: T;
+        generatedAt?: T;
+        sourceCredits?:
+          | T
+          | {
+              publisher?: T;
+              publisherAr?: T;
+              title?: T;
+              publishedAt?: T;
+              id?: T;
+            };
+      };
+  uuid?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news-categories_select".
+ */
+export interface NewsCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  nameAr?: T;
+  slug?: T;
+  status?: T;
+  defaultCategory?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news-topics_select".
+ */
+export interface NewsTopicsSelect<T extends boolean = true> {
+  name?: T;
+  nameAr?: T;
+  slug?: T;
+  status?: T;
+  reviewStatus?: T;
+  origin?: T;
+  proposedReason?: T;
+  approvedBy?: T;
+  approvedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news-hub-chips_select".
+ */
+export interface NewsHubChipsSelect<T extends boolean = true> {
+  chipKind?: T;
+  key?: T;
+  visible?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "article-audit-logs_select".
+ */
+export interface ArticleAuditLogsSelect<T extends boolean = true> {
+  articleType?: T;
+  action?: T;
+  articleLang?: T;
+  articleId?: T;
+  articleTitle?: T;
+  articleSlug?: T;
+  actionBy?: T;
+  isSystemAction?: T;
+  changedFields?:
+    | T
+    | {
+        field?: T;
+        before?: T;
+        after?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -274,6 +1297,30 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+  sizes?:
+    | T
+    | {
+        w320?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        w640?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

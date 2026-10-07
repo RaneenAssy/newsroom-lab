@@ -1,0 +1,256 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+/*
+ * UA Finance backoffice theme — ported from apps/backend (Berry/MUI):
+ *   primary   #2F4C68 (deep blue-gray)   secondary  #D4AF37 (gold)
+ *   greys     #f8fafc → #121926          radius 8px, Roboto
+ * Payload's own styles live in `@layer payload-default`, so these unlayered rules win.
+ */
+
+:root {
+  --uaf-primary: #2f4c68;
+  --uaf-primary-dark: #314557;
+  --uaf-primary-light: #5c7c9e;
+  --uaf-primary-200: #8ba2b8;
+  --uaf-gold: #d4af37;
+  --uaf-gold-dark: #a8872b;
+  --uaf-gold-light: #fff5d2;
+  --uaf-card-shadow: 0 2px 14px 0 rgb(32 40 45 / 8%);
+
+  --font-body: 'Roboto', sans-serif;
+  --style-radius-s: 6px;
+  --style-radius-m: 8px;
+  --style-radius-l: 12px;
+}
+
+/* ───────────────────────────── Light ───────────────────────────── */
+html[data-theme='light'] {
+  --theme-bg: #eef2f6;
+  --theme-text: #364152;
+  --theme-input-bg: #ffffff;
+  --theme-border-color: #e3e8ef;
+
+  --theme-elevation-0: #ffffff;
+  --theme-elevation-50: #f8fafc;
+  --theme-elevation-100: #eef2f6;
+  --theme-elevation-150: #e8edf3;
+  --theme-elevation-200: #e3e8ef;
+  --theme-elevation-250: #d9e0e9;
+  --theme-elevation-300: #cdd5df;
+  --theme-elevation-350: #b9c3d0;
+  --theme-elevation-400: #9aa4b2;
+  --theme-elevation-450: #8792a2;
+  --theme-elevation-500: #697586;
+  --theme-elevation-550: #5d6a7c;
+  --theme-elevation-600: #4b5565;
+  --theme-elevation-700: #364152;
+  --theme-elevation-750: #2c3646;
+  --theme-elevation-800: #2f4c68;
+  --theme-elevation-850: #212a38;
+  --theme-elevation-900: #1b2330;
+  --theme-elevation-950: #161d28;
+  --theme-elevation-1000: #121926;
+
+  --theme-success-500: #00c853;
+  --theme-error-500: #f44336;
+  --theme-warning-500: #ffc107;
+}
+
+/* ───────────────────────────── Dark (Berry navy) ───────────────────────────── */
+html[data-theme='dark'] {
+  --theme-bg: #111936;
+  --theme-text: #d7dcec;
+  --theme-input-bg: #1a223f;
+  --theme-border-color: #29314f;
+
+  --theme-elevation-0: #111936;
+  --theme-elevation-50: #1a223f;
+  --theme-elevation-100: #212946;
+  --theme-elevation-150: #29314f;
+  --theme-elevation-200: #323b5c;
+  --theme-elevation-250: #3b4568;
+  --theme-elevation-300: #4a5578;
+  --theme-elevation-350: #5a6689;
+  --theme-elevation-400: #6b789c;
+  --theme-elevation-450: #7684ad;
+  --theme-elevation-500: #8492c4;
+  --theme-elevation-550: #96a3d0;
+  --theme-elevation-600: #a9b5de;
+  --theme-elevation-700: #bdc8f0;
+  --theme-elevation-750: #c8d1f3;
+  --theme-elevation-800: #d7dcec;
+  --theme-elevation-850: #e1e5f3;
+  --theme-elevation-900: #eceffa;
+  --theme-elevation-950: #f5f7fd;
+  --theme-elevation-1000: #ffffff;
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+/* ───────────────────────────── Buttons ───────────────────────────── */
+.btn--style-primary {
+  --bg-color: var(--uaf-primary);
+  --color: #fff;
+  --hover-bg: var(--uaf-primary-light);
+  --hover-color: #fff;
+}
+html[data-theme='dark'] .btn--style-primary {
+  --bg-color: #2196f3;
+  --hover-bg: #1e88e5;
+}
+.btn--style-secondary {
+  --btn-border: 1px solid var(--uaf-primary);
+  --color: var(--uaf-primary);
+  --hover-color: var(--uaf-gold-dark);
+  --hover-btn-border: 1px solid var(--uaf-gold);
+}
+html[data-theme='dark'] .btn--style-secondary {
+  --btn-border: 1px solid var(--theme-elevation-300);
+  --color: var(--theme-elevation-800);
+}
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* ───────────────────────────── Links, focus, selection ───────────────────────────── */
+a:not(.btn):not(.nav__link):hover {
+  color: var(--uaf-gold-dark);
+}
+:focus-visible {
+  outline-color: var(--uaf-gold);
+}
+::selection {
+  background: var(--uaf-gold-light);
+  color: var(--uaf-primary-dark);
+}
+
+/* ───────────────────────────── Sidebar ───────────────────────────── */
+.nav {
+  background: var(--theme-elevation-0);
+  border-right: 1px solid var(--theme-elevation-150);
+}
+.nav-group__toggle,
+.nav__label {
+  color: var(--theme-elevation-500);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.nav__link {
+  font-size: 14.5px;
+  line-height: 22px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  margin-bottom: 2px;
+  width: 100%;
+  color: var(--theme-elevation-700);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.nav__link:hover {
+  background: var(--uaf-gold-light);
+  color: var(--uaf-primary-dark);
+}
+.nav__link.active,
+.nav__link:has(.nav__link-indicator) {
+  background: var(--uaf-gold-light);
+  color: var(--uaf-primary);
+  font-weight: 500;
+}
+.nav__link-indicator {
+  display: none;
+}
+html[data-theme='dark'] .nav__link:hover,
+html[data-theme='dark'] .nav__link.active,
+html[data-theme='dark'] .nav__link:has(.nav__link-indicator) {
+  background: var(--theme-elevation-150);
+  color: #fff;
+}
+
+/* ───────────────────────────── Header ───────────────────────────── */
+.app-header {
+  background: var(--theme-elevation-0);
+  border-bottom: 1px solid var(--theme-elevation-150);
+}
+
+/* ───────────────────────────── Cards, tables, fields ───────────────────────────── */
+.card,
+.collection-list .table-wrap,
+.table-wrap,
+.collapsible,
+.drawer__content,
+.popup__content {
+  border-radius: 12px;
+}
+.card {
+  background: var(--theme-elevation-0);
+  border: 1px solid var(--theme-elevation-100);
+  box-shadow: var(--uaf-card-shadow);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.card:hover {
+  border-color: var(--uaf-gold);
+  box-shadow: 0 4px 20px 0 rgb(212 175 55 / 18%);
+}
+.table table {
+  background: var(--theme-elevation-0);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--uaf-card-shadow);
+}
+.table thead th {
+  background: var(--theme-elevation-50);
+  color: var(--theme-elevation-600);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.table tbody tr:hover {
+  background: var(--theme-elevation-50);
+}
+.field-type input,
+.field-type textarea,
+.field-type .rs__control {
+  border-radius: 8px;
+}
+.field-type input:focus,
+.field-type textarea:focus,
+.field-type .rs__control--is-focused {
+  border-color: var(--uaf-gold);
+  box-shadow: 0 0 0 3px rgb(212 175 55 / 20%);
+}
+.checkbox-input__input.checkbox-input__input--checked,
+.checkbox-input__input[data-checked='true'] {
+  background: var(--uaf-primary);
+  border-color: var(--uaf-primary);
+}
+
+/* ───────────────────────────── Login / minimal template ───────────────────────────── */
+.template-minimal {
+  background: linear-gradient(160deg, #eef2f6 0%, #e3e8ef 100%);
+}
+html[data-theme='dark'] .template-minimal {
+  background: linear-gradient(160deg, #111936 0%, #1a223f 100%);
+}
+.template-minimal__wrap {
+  background: var(--theme-elevation-0);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 8px 32px 0 rgb(32 40 45 / 12%);
+}
+
+/* Logo artwork has dark-navy text — sit it on a white plate in dark mode. */
+html[data-theme='dark'] .uaf-logo {
+  background: #fff;
+  padding: 12px 24px;
+  border-radius: 12px;
+}
+html[data-theme='dark'] .uaf-icon {
+  background: #fff;
+  padding: 3px 5px;
+  border-radius: 8px;
+}
