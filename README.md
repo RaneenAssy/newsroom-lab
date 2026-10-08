@@ -12,6 +12,7 @@ This project rebuilds a slice of that backoffice in Payload — staff and permis
   - Articles with tabs for content, taxonomy & tags, SEO, publishing, provenance and AI/enrichment.
   - **English and Arabic**: each article has one language (`lang`). The two versions of a story are separate articles that share a translation group (`uuid`). A sidebar panel can create the other-language draft, link two existing articles, or unlink them; only one article per language is allowed per group.
   - **Body editor**: the same SunEditor setup as the UA Finance backoffice (same toolbar, link `rel` rules, 30,000-character counter, RTL for Arabic), stored as an HTML string and sanitised on save (images stripped, external links get `rel="nofollow"`).
+  - **Live Preview**: the eye icon next to Save opens the article rendered as readers would see it (right-to-left for Arabic), updating as you type, before saving. It is a private, staff-only page (`/preview/news/<id>`) and works for saved articles; Mobile, Tablet and Desktop widths are in the toolbar.
   - **Audit log**: an append-only record of creates, edits, status changes and deletes, with before/after values for tracked fields. It is written by hooks and cannot be edited through the API.
   - Categories, topics (with an AI-proposed → approved review flow) and hub chips.
 - **UA Finance admin theme** — colours, logo and typography ported from the existing backoffice.
@@ -67,6 +68,7 @@ This project rebuilds a slice of that backoffice in Payload — staff and permis
 | `DATABASE_URL` | yes | MongoDB connection string. |
 | `PAYLOAD_SECRET` | yes | Secret used to sign sessions. |
 | `NEXT_PUBLIC_ARTICLE_MAX_CHAR_COUNT` | no | Body character limit (default `30000`). Shared by the editor and server validation. |
+| `NEXT_PUBLIC_SERVER_URL` | no | Public origin of this app (for example `https://cms.example.com`), used to build the Live Preview address. Leave unset locally: it is taken from the request, so any port works. |
 | `PUBLIC_BASE_DOMAIN` | no | Domain treated as internal when normalising article links (default `uafinances.com`). |
 | `AUDIT_LOG_AUTHORIZED_USERS_EMAILS` | no | Comma-separated emails allowed to read audit logs, in addition to Super Admins and the `view_audit_logs` permission. |
 
@@ -123,7 +125,7 @@ tests/int/              Vitest tests (editor patches, sanitiser, translations)
 npm run test:int
 ```
 
-49 tests cover the ported editor patches, the sanitiser and link rules, the field's validation and options, and the translation helper. The Playwright tests in `tests/e2e` are the untouched template ones and have not been updated for this project.
+58 tests cover the ported editor patches, the sanitiser and link rules, the field's validation and options, the translation helper, and the Live Preview address and HTML cleaner. The Playwright tests in `tests/e2e` are the untouched template ones and have not been updated for this project.
 
 ## Not built (yet)
 

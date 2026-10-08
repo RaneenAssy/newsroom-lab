@@ -21,6 +21,7 @@
   "dependencies": {
     "@payloadcms/db-mongodb": "3.90.2",
     "@payloadcms/next": "3.90.2",
+    "@payloadcms/live-preview-react": "3.90.2",
     "@payloadcms/richtext-lexical": "3.90.2",
     "@payloadcms/ui": "3.90.2",
     "cheerio": "1.2.0",

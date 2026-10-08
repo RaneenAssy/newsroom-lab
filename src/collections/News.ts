@@ -2,6 +2,7 @@ import { ValidationError, type CollectionBeforeChangeHook, type CollectionBefore
 import { hasPermission } from '../access'
 import { articleAuditHooks, NEWS_TRACKED_FIELDS } from '../audit/articleAudit'
 import { articleBodyField } from '../fields/articleBody'
+import { newsPreviewUrl } from '../preview/previewUrl'
 import { LANG_LABEL, newsTranslationEndpoints, type NewsLang } from './newsTranslations'
 
 const slugify = (value: string) =>
@@ -111,6 +112,16 @@ export const News: CollectionConfig = {
     group: 'News',
     defaultColumns: ['title', 'mainCategory', 'lang', 'status', 'publishedAt', 'postEnrichmentStatus'],
     listSearchableFields: ['title', 'slug', 'source'],
+    // Live Preview: the article rendered as readers would see it, updating while staff type (see src/app/(preview)).
+    // It needs a saved article, so a brand-new one shows no Preview tab until its first save.
+    livePreview: {
+      url: ({ data, req }) => newsPreviewUrl(req, data?.id),
+      breakpoints: [
+        { label: 'Mobile', name: 'mobile', width: 375, height: 667 },
+        { label: 'Tablet', name: 'tablet', width: 768, height: 1024 },
+        { label: 'Desktop', name: 'desktop', width: 1280, height: 800 },
+      ],
+    },
   },
   defaultSort: '-publishedAt',
   access: {

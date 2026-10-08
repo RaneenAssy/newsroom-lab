@@ -48,3 +48,6 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Throwaway spikes — may contain data derived from production copies. Never commit.
+/spikes/
