@@ -77,6 +77,7 @@ export interface Config {
     'billing-products': BillingProduct;
     'user-subscriptions': UserSubscription;
     news: News;
+    comments: Comment;
     'news-categories': NewsCategory;
     'news-topics': NewsTopic;
     'news-hub-chips': NewsHubChip;
@@ -99,6 +100,7 @@ export interface Config {
     'billing-products': BillingProductsSelect<false> | BillingProductsSelect<true>;
     'user-subscriptions': UserSubscriptionsSelect<false> | UserSubscriptionsSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
+    comments: CommentsSelect<false> | CommentsSelect<true>;
     'news-categories': NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
     'news-topics': NewsTopicsSelect<false> | NewsTopicsSelect<true>;
     'news-hub-chips': NewsHubChipsSelect<false> | NewsHubChipsSelect<true>;
@@ -659,6 +661,32 @@ export interface NewsCategory {
   createdAt: string;
 }
 /**
+ * Reader comments from article pages. They appear on the site immediately; set Status to Hidden to take one down.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "comments".
+ */
+export interface Comment {
+  id: string;
+  status: 'visible' | 'hidden';
+  /**
+   * Internal: why it was hidden.
+   */
+  moderationNote?: string | null;
+  hiddenBy?: (string | null) | Staff;
+  hiddenAt?: string | null;
+  /**
+   * The reader's words; staff can hide but not edit them.
+   */
+  body: string;
+  excerpt?: string | null;
+  article: string | News;
+  author: string | User;
+  parent?: (string | null) | Comment;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "news-topics".
  */
@@ -797,6 +825,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'news';
         value: string | News;
+      } | null)
+    | ({
+        relationTo: 'comments';
+        value: string | Comment;
       } | null)
     | ({
         relationTo: 'news-categories';
@@ -1211,6 +1243,23 @@ export interface NewsSelect<T extends boolean = true> {
             };
       };
   uuid?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "comments_select".
+ */
+export interface CommentsSelect<T extends boolean = true> {
+  status?: T;
+  moderationNote?: T;
+  hiddenBy?: T;
+  hiddenAt?: T;
+  body?: T;
+  excerpt?: T;
+  article?: T;
+  author?: T;
+  parent?: T;
   updatedAt?: T;
   createdAt?: T;
 }

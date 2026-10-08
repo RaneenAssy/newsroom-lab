@@ -15,6 +15,7 @@ This project rebuilds a slice of that backoffice in Payload — staff and permis
   - **Live Preview**: the eye icon next to Save opens the article rendered as readers would see it (right-to-left for Arabic), updating as you type, before saving. It is a private, staff-only page (`/preview/news/<id>`) and works for saved articles; Mobile, Tablet and Desktop widths are in the toolbar.
   - **Audit log**: an append-only record of creates, edits, status changes and deletes, with before/after values for tracked fields. It is written by hooks and cannot be edited through the API.
   - Categories, topics (with an AI-proposed → approved review flow) and hub chips.
+- **Reader comments (proof of concept)** — a demo public news site at `/news`, styled like the live uafinances.com article page, where signed-in readers comment on published articles with one level of replies. Comments appear at once; staff hide or delete them under **News → Comments**. Limits: 3 comments a minute per reader, no repeat posts, 2,000 characters, plain text. The article's "Comments enabled" switch is respected.
 - **UA Finance admin theme** — colours, logo and typography ported from the existing backoffice.
 
 ## Getting started
@@ -59,6 +60,16 @@ This project rebuilds a slice of that backoffice in Payload — staff and permis
 
    This adds 6 categories, 8 topics, 5 hub chips and 13 placeholder articles (9 English, 4 Arabic, some linked as translations), written as your staff account so the audit log has real history. It is safe to re-run.
 
+6. **Optional — try reader comments:**
+
+   ```bash
+   npm run seed:comments
+   ```
+
+   This adds 3 demo readers and a few comments on published articles. Open http://localhost:3000/news, pick an article and sign in as `sara@demo-reader.test`.
+
+   > The demo sign-in takes only a customer's email, with no password: customer login lives in the UA Finance public API, which this playground does not have. It works in development only (or with `COMMENTS_DEMO_SIGNIN=true`) and must never be used for real.
+
 > The repo is set up with npm (`package-lock.json`). Some template leftovers mention pnpm (`engines`, the `test` script and `docker-compose.yml`); use the npm commands below.
 
 ## Environment variables
@@ -70,6 +81,7 @@ This project rebuilds a slice of that backoffice in Payload — staff and permis
 | `NEXT_PUBLIC_ARTICLE_MAX_CHAR_COUNT` | no | Body character limit (default `30000`). Shared by the editor and server validation. |
 | `NEXT_PUBLIC_SERVER_URL` | no | Public origin of this app (for example `https://cms.example.com`), used to build the Live Preview address. Leave unset locally: it is taken from the request, so any port works. |
 | `PUBLIC_BASE_DOMAIN` | no | Domain treated as internal when normalising article links (default `uafinances.com`). |
+| `COMMENTS_DEMO_SIGNIN` | no | Set to `true` to allow the passwordless demo reader sign-in outside development. Leave unset. |
 | `AUDIT_LOG_AUTHORIZED_USERS_EMAILS` | no | Comma-separated emails allowed to read audit logs, in addition to Super Admins and the `view_audit_logs` permission. |
 
 ## Scripts
@@ -79,6 +91,7 @@ This project rebuilds a slice of that backoffice in Payload — staff and permis
 | `npm run dev` | Start the dev server. |
 | `npm run build` / `npm start` | Production build and server. |
 | `npm run seed:news` | Load the sample news data (idempotent). |
+| `npm run seed:comments` | Load demo readers and comments (run `seed:news` first; idempotent). |
 | `npm run generate:types` | Regenerate `src/payload-types.ts` after changing collections. |
 | `npm run generate:importmap` | Regenerate the admin import map after adding custom components. |
 | `npm run test:int` | Run the Vitest suite. |
@@ -94,7 +107,7 @@ To run your own one-off script against the local API, use `npx payload run path/
 | Customers | `users` (customer records — customer login is not handled here) |
 | Site Setup | `languages` |
 | Subscriptions | `products` (plans), `billing-products` (plan prices), `user-subscriptions` |
-| News | `news`, `news-categories`, `news-topics`, `news-hub-chips`, `article-audit-logs` |
+| News | `news`, `comments`, `news-categories`, `news-topics`, `news-hub-chips`, `article-audit-logs` |
 | Uploads | `media` (with 320px and 640px image sizes) |
 
 Data is stored in the MongoDB you point `DATABASE_URL` at; each collection slug is a Mongo collection. Field names are camelCase (`mainCategory`, `scheduleTime`), which differs from the snake_case used by the existing UA Finance database.
@@ -107,15 +120,19 @@ src/
   fields/articleBody/   SunEditor field, ported editor patches, HTML sanitiser, options
   audit/                Article audit helper and hooks
   access/               Permission and role access helpers
-  components/admin/     Admin UI: logo, audit-history link, translations panel
+  components/admin/     Admin UI: logo, audit-history and comments links, translations panel
+  comments/             Comment rules, thread listing and the demo reader sign-in
   app/(payload)/        Admin, API routes and the admin theme (custom.scss)
-scripts/seed-news.ts    Sample data
-tests/int/              Vitest tests (editor patches, sanitiser, translations)
+  app/(preview)/        Staff-only Live Preview page
+  app/(site)/           Demo public news pages with reader comments
+scripts/seed-news.ts    Sample news data
+scripts/seed-comments.ts  Demo readers and comments
+tests/int/              Vitest tests (editor patches, sanitiser, translations, preview, comments)
 ```
 
 ## How a few things work
 
-- **Permissions.** Super Admins can do everything. Other staff need a role whose permissions include the relevant names (`add_news`, `edit_news`, `delete_news`, `view_all_news`, `view_audit_logs`, and the news-category ones). They are created on first start; assign them to roles in the admin.
+- **Permissions.** Super Admins can do everything. Other staff need a role whose permissions include the relevant names (`add_news`, `edit_news`, `delete_news`, `view_all_news`, `view_audit_logs`, `view_comments`, `moderate_comments`, and the news-category ones). They are created on first start; assign them to roles in the admin.
 - **Audit log.** Hooks on `news` diff the tracked fields on every save. Changing an article's translation group (`uuid`) — i.e. linking or unlinking a translation — is recorded too. Audit failures are logged but never block a save.
 - **Body field.** `articleBodyField()` (`src/fields/articleBody/index.ts`) is reusable for other collections. The sanitiser in `src/fields/articleBody/sanitize/` is a copy of the UA Finance API's `prepareArticleBodyHtml`; keep the two in sync if the original changes.
 
@@ -125,7 +142,7 @@ tests/int/              Vitest tests (editor patches, sanitiser, translations)
 npm run test:int
 ```
 
-58 tests cover the ported editor patches, the sanitiser and link rules, the field's validation and options, the translation helper, and the Live Preview address and HTML cleaner. The Playwright tests in `tests/e2e` are the untouched template ones and have not been updated for this project.
+66 tests cover the ported editor patches, the sanitiser and link rules, the field's validation and options, the translation helper, the Live Preview address and HTML cleaner, and the reader comment rules. The comment tests use the database in `.env` and remove what they create. The Playwright tests in `tests/e2e` are the untouched template ones and have not been updated for this project.
 
 ## Not built (yet)
 
@@ -133,7 +150,7 @@ npm run test:int
 - The AI newsroom screens (RSS feeds, suggestion queue, AI audit reports) and the enrichment review screen.
 - Blog, FAQ, tickets and the other backoffice sections.
 - A public frontend that uses the translation links (for example a "read in Arabic" switch).
-- Customer authentication, billing integration and payments.
+- Customer authentication (the comments demo uses a passwordless stand-in), billing integration and payments.
 - Visual checks of the editor in dark mode, and handling for articles already longer than the 30,000-character limit.
 
 ## Notes

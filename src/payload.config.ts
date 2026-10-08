@@ -19,6 +19,7 @@ import { NewsCategories } from './collections/NewsCategories'
 import { NewsTopics } from './collections/NewsTopics'
 import { NewsHubChips } from './collections/NewsHubChips'
 import { News } from './collections/News'
+import { Comments } from './collections/Comments'
 import { ArticleAuditLogs } from './collections/ArticleAuditLogs'
 
 const filename = fileURLToPath(import.meta.url)
@@ -52,6 +53,7 @@ export default buildConfig({
     BillingProducts,
     UserSubscriptions,
     News,
+    Comments,
     NewsCategories,
     NewsTopics,
     NewsHubChips,
@@ -96,6 +98,8 @@ export default buildConfig({
       ['delete_news_category', 'News Categories'],
       ['toggle_active_news_category', 'News Categories'],
       ['view_audit_logs', 'Audit Logs'],
+      ['view_comments', 'Comments'],
+      ['moderate_comments', 'Comments'],
     ]
     for (const [name, section] of newsPermissions) {
       const found = await payload.find({ collection: 'permissions', where: { name: { equals: name } }, limit: 1, depth: 0 })

@@ -185,6 +185,11 @@ export const News: CollectionConfig = {
       type: 'ui',
       admin: { position: 'sidebar', components: { Field: '/components/admin/AuditHistoryLink#AuditHistoryLink' } },
     },
+    {
+      name: 'readerComments',
+      type: 'ui',
+      admin: { position: 'sidebar', components: { Field: '/components/admin/CommentsLink#CommentsLink' } },
+    },
 
     {
       type: 'tabs',

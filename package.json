@@ -16,12 +16,13 @@
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
-    "seed:news": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/seed-news.ts"
+    "seed:news": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/seed-news.ts",
+    "seed:comments": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/seed-comments.ts"
   },
   "dependencies": {
     "@payloadcms/db-mongodb": "3.90.2",
-    "@payloadcms/next": "3.90.2",
     "@payloadcms/live-preview-react": "3.90.2",
+    "@payloadcms/next": "3.90.2",
     "@payloadcms/richtext-lexical": "3.90.2",
     "@payloadcms/ui": "3.90.2",
     "cheerio": "1.2.0",
