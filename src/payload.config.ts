@@ -4,6 +4,8 @@ import path from 'path'
 import { buildConfig, type Where } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
+import { ar } from '@payloadcms/translations/languages/ar'
+import { en } from '@payloadcms/translations/languages/en'
 
 import { Media } from './collections/Media'
 import { Users } from './collections/Users'
@@ -28,14 +30,25 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     user: Staff.slug,
+    // The production backoffice has no usable dark mode (its dark tokens are the template's stock blue/purple), so light only.
+    theme: 'light',
     meta: {
-      titleSuffix: ' — UA Finance Backoffice',
-      icons: [{ rel: 'icon', type: 'image/png', url: '/ua-finance-icon.png' }],
+      titleSuffix: ' | UA Finance',
+      icons: [{ rel: 'icon', type: 'image/png', url: '/backoffice/favicon.png' }],
     },
     components: {
       graphics: {
         Logo: '/components/admin/Logo#Logo',
         Icon: '/components/admin/Icon#Icon',
+      },
+      // Production backoffice shell (see src/components/backoffice).
+      Nav: '/components/backoffice/Nav/BackofficeNav#BackofficeNav',
+      actions: ['/components/backoffice/Header/HeaderActions#HeaderActions'],
+      providers: ['/components/backoffice/Shell/BackofficeShell#BackofficeShell'],
+      views: {
+        dashboard: { Component: '/components/backoffice/Dashboard/BackofficeDashboard#BackofficeDashboard' },
+        login: { Component: '/components/backoffice/Login/BackofficeLoginView#BackofficeLoginView' },
+        comingSoon: { Component: '/components/backoffice/ComingSoon/ComingSoonView#ComingSoonView', path: '/coming-soon/:section' },
       },
     },
     importMap: {
@@ -60,6 +73,8 @@ export default buildConfig({
     ArticleAuditLogs,
     Media,
   ],
+  // Admin UI languages: English (default) and Arabic, which switches the admin to right-to-left.
+  i18n: { supportedLanguages: { en, ar }, fallbackLanguage: 'en' },
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -106,9 +121,15 @@ export default buildConfig({
       if (!found.totalDocs) await payload.create({ collection: 'permissions', data: { name, section, status: true } })
     }
 
+    // Languages moved from checkboxes to production's selects (RTL "1"/"0", Status Active/Inactive): convert older records once.
+    const languages = payload.db.connection.collection('languages')
+    await languages.updateMany({ rtl: true }, { $set: { rtl: '1' } })
+    await languages.updateMany({ rtl: { $in: [false, null] } }, { $set: { rtl: '0' } })
+    await languages.updateMany({ status: { $in: [true, null] } }, { $set: { status: 'active' } }) // null/missing: the old default was on
+    await languages.updateMany({ status: false }, { $set: { status: 'inactive' } })
     for (const lang of [
-      { name: 'English', code: 'en', appLangCode: 'en', rtl: false },
-      { name: 'Arabic', code: 'ar', appLangCode: 'ar', rtl: true },
+      { name: 'English', code: 'en', appLangCode: 'en', rtl: '0' as const, status: 'active' as const },
+      { name: 'Arabic', code: 'ar', appLangCode: 'ar', rtl: '1' as const, status: 'active' as const },
     ]) {
       if (!(await exists('languages', { code: { equals: lang.code } }))) {
         await payload.create({ collection: 'languages', data: lang })

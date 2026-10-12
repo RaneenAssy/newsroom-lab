@@ -356,9 +356,9 @@ export interface Language {
   name: string;
   code: string;
   appLangCode: string;
-  rtl?: boolean | null;
+  rtl: '1' | '0';
+  status: 'active' | 'inactive';
   flagImg?: (string | null) | Media;
-  status?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1021,8 +1021,8 @@ export interface LanguagesSelect<T extends boolean = true> {
   code?: T;
   appLangCode?: T;
   rtl?: T;
-  flagImg?: T;
   status?: T;
+  flagImg?: T;
   updatedAt?: T;
   createdAt?: T;
 }

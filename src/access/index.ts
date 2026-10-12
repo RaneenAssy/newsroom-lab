@@ -2,13 +2,13 @@ import type { Access, PayloadRequest } from 'payload'
 
 export const authenticated: Access = ({ req }) => Boolean(req.user)
 
-type StaffAccess = { superAdmin: boolean; permissions: Set<string> }
+export type StaffAccess = { superAdmin: boolean; permissions: Set<string> }
 
 /**
  * Resolves the logged-in staff member's role once per request: Super Admin flag plus the names of
  * the active permissions on the role. Mirrors `requirePermission` in the legacy API.
  */
-const loadStaffAccess = async (req: PayloadRequest): Promise<StaffAccess> => {
+export const loadStaffAccess = async (req: PayloadRequest): Promise<StaffAccess> => {
   const cached = req.context.staffAccess as StaffAccess | undefined
   if (cached) return cached
 
@@ -53,6 +53,9 @@ const auditLogAllowlist = new Set(
     .map((email) => email.trim().toLowerCase())
     .filter(Boolean),
 )
+
+/** Whether this email is on the audit-log allowlist (the backoffice shows the audit-log menu items on this alone). */
+export const isAuditLogAllowlisted = (email: string | null | undefined): boolean => Boolean(email && auditLogAllowlist.has(email.toLowerCase()))
 
 /** Audit logs: Super Admins, the `view_audit_logs` permission, or an emailed allowlist (legacy behaviour). */
 export const canReadAuditLogs: Access = async (args) => {

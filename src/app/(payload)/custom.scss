@@ -1,35 +1,63 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Poppins:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap');
 
 /*
- * UA Finance backoffice theme — ported from apps/backend (Berry/MUI):
- *   primary   #2F4C68 (deep blue-gray)   secondary  #D4AF37 (gold)
- *   greys     #f8fafc → #121926          radius 8px, Roboto
- * Payload's own styles live in `@layer payload-default`, so these unlayered rules win.
+ * UA Finance backoffice look for the Payload admin (Payload 3.90.2).
+ * Source of truth: ua-finances apps/backend — src/assets/scss/_themes-vars.module.scss (colours), src/themes/* (type, shadows,
+ * component overrides), src/config.js (Roboto, radius 8).
+ *
+ * Payload's own styles live in `@layer payload-default`; everything here is unlayered, so it wins without !important.
+ * Section 3 is the only place that targets Payload's internal class names — each rule there may break on a Payload upgrade.
  */
 
+/* ═══════════════════════ 1. Tokens + Payload theme variables (supported API) ═══════════════════════ */
 :root {
+  /* palette — _themes-vars.module.scss */
+  --uaf-paper: #ffffff;
+  --uaf-primary-light: #5c7c9e;
   --uaf-primary: #2f4c68;
   --uaf-primary-dark: #314557;
-  --uaf-primary-light: #5c7c9e;
   --uaf-primary-200: #8ba2b8;
+  --uaf-primary-800: #173957;
+  --uaf-gold-light: #fff5d2;
   --uaf-gold: #d4af37;
   --uaf-gold-dark: #a8872b;
-  --uaf-gold-light: #fff5d2;
-  --uaf-card-shadow: 0 2px 14px 0 rgb(32 40 45 / 8%);
+  --uaf-gold-200: #f1da89;
+  --uaf-gold-800: #7a6a1e;
+  --uaf-success: #00e676;
+  --uaf-success-dark: #00c853;
+  --uaf-error: #f44336;
+  --uaf-error-dark: #c62828;
+  --uaf-warning: #ffe57f;
+  --uaf-warning-dark: #ffc107;
+  --uaf-grey-50: #f8fafc;
+  --uaf-grey-100: #eef2f6;
+  --uaf-grey-200: #e3e8ef;
+  --uaf-grey-300: #cdd5df;
+  --uaf-grey-500: #697586;
+  --uaf-grey-600: #4b5565;
+  --uaf-grey-700: #364152;
+  --uaf-grey-900: #121926;
+  /* shadows — themes/shadows.jsx (grey900 at 24%) */
+  --uaf-shadow-z1: 0 1px 2px 0 rgb(18 25 38 / 24%);
+  --uaf-shadow-z8: 0 8px 16px 0 rgb(18 25 38 / 24%);
+  --uaf-shadow-gold: 0 12px 14px 0 rgb(212 175 55 / 30%);
+  /* live customization (floating button); defaults = config.js. Sizes below are px: the MUI theme's rem values assume a 16px root. */
+  --uaf-font: 'Roboto', sans-serif;
+  --uaf-radius: 8px;
 
-  --font-body: 'Roboto', sans-serif;
-  --style-radius-s: 6px;
-  --style-radius-m: 8px;
-  --style-radius-l: 12px;
+  --font-body: var(--uaf-font);
+  --style-radius-s: 4px;
+  --style-radius-m: var(--uaf-radius);
+  --style-radius-l: var(--uaf-radius);
+  --app-header-height: 88px;
+  --nav-width: 260px; /* store/constant.js drawerWidth */
 }
 
-/* ───────────────────────────── Light ───────────────────────────── */
 html[data-theme='light'] {
-  --theme-bg: #eef2f6;
-  --theme-text: #364152;
-  --theme-input-bg: #ffffff;
-  --theme-border-color: #e3e8ef;
-
+  --theme-bg: var(--uaf-paper);
+  --theme-text: var(--uaf-grey-700);
+  --theme-input-bg: var(--uaf-paper);
+  --theme-border-color: var(--uaf-grey-300);
   --theme-elevation-0: #ffffff;
   --theme-elevation-50: #f8fafc;
   --theme-elevation-100: #eef2f6;
@@ -43,214 +71,846 @@ html[data-theme='light'] {
   --theme-elevation-500: #697586;
   --theme-elevation-550: #5d6a7c;
   --theme-elevation-600: #4b5565;
+  --theme-elevation-650: #404b5b;
   --theme-elevation-700: #364152;
   --theme-elevation-750: #2c3646;
   --theme-elevation-800: #2f4c68;
   --theme-elevation-850: #212a38;
-  --theme-elevation-900: #1b2330;
-  --theme-elevation-950: #161d28;
+  --theme-elevation-900: #121926;
+  --theme-elevation-950: #121926;
   --theme-elevation-1000: #121926;
-
-  --theme-success-500: #00c853;
-  --theme-error-500: #f44336;
-  --theme-warning-500: #ffc107;
-}
-
-/* ───────────────────────────── Dark (Berry navy) ───────────────────────────── */
-html[data-theme='dark'] {
-  --theme-bg: #111936;
-  --theme-text: #d7dcec;
-  --theme-input-bg: #1a223f;
-  --theme-border-color: #29314f;
-
-  --theme-elevation-0: #111936;
-  --theme-elevation-50: #1a223f;
-  --theme-elevation-100: #212946;
-  --theme-elevation-150: #29314f;
-  --theme-elevation-200: #323b5c;
-  --theme-elevation-250: #3b4568;
-  --theme-elevation-300: #4a5578;
-  --theme-elevation-350: #5a6689;
-  --theme-elevation-400: #6b789c;
-  --theme-elevation-450: #7684ad;
-  --theme-elevation-500: #8492c4;
-  --theme-elevation-550: #96a3d0;
-  --theme-elevation-600: #a9b5de;
-  --theme-elevation-700: #bdc8f0;
-  --theme-elevation-750: #c8d1f3;
-  --theme-elevation-800: #d7dcec;
-  --theme-elevation-850: #e1e5f3;
-  --theme-elevation-900: #eceffa;
-  --theme-elevation-950: #f5f7fd;
-  --theme-elevation-1000: #ffffff;
+  --theme-success-500: var(--uaf-success-dark);
+  --theme-error-500: var(--uaf-error);
+  --theme-warning-500: var(--uaf-warning-dark);
 }
 
 body {
-  font-family: var(--font-body);
-}
-
-/* ───────────────────────────── Buttons ───────────────────────────── */
-.btn--style-primary {
-  --bg-color: var(--uaf-primary);
-  --color: #fff;
-  --hover-bg: var(--uaf-primary-light);
-  --hover-color: #fff;
-}
-html[data-theme='dark'] .btn--style-primary {
-  --bg-color: #2196f3;
-  --hover-bg: #1e88e5;
-}
-.btn--style-secondary {
-  --btn-border: 1px solid var(--uaf-primary);
-  --color: var(--uaf-primary);
-  --hover-color: var(--uaf-gold-dark);
-  --hover-btn-border: 1px solid var(--uaf-gold);
-}
-html[data-theme='dark'] .btn--style-secondary {
-  --btn-border: 1px solid var(--theme-elevation-300);
-  --color: var(--theme-elevation-800);
-}
-.btn {
-  border-radius: 8px;
-  font-weight: 500;
-}
-
-/* ───────────────────────────── Links, focus, selection ───────────────────────────── */
-a:not(.btn):not(.nav__link):hover {
-  color: var(--uaf-gold-dark);
-}
-:focus-visible {
-  outline-color: var(--uaf-gold);
+  font-family: var(--uaf-font);
+  color: var(--uaf-grey-700);
 }
 ::selection {
   background: var(--uaf-gold-light);
   color: var(--uaf-primary-dark);
 }
 
-/* ───────────────────────────── Sidebar ───────────────────────────── */
-.nav {
-  background: var(--theme-elevation-0);
-  border-right: 1px solid var(--theme-elevation-150);
-}
-.nav-group__toggle,
-.nav__label {
-  color: var(--theme-elevation-500);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.nav__link {
-  font-size: 14.5px;
-  line-height: 22px;
-  padding: 8px 14px;
-  border-radius: 8px;
-  margin-bottom: 2px;
-  width: 100%;
-  color: var(--theme-elevation-700);
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.nav__link:hover {
-  background: var(--uaf-gold-light);
-  color: var(--uaf-primary-dark);
-}
-.nav__link.active,
-.nav__link:has(.nav__link-indicator) {
-  background: var(--uaf-gold-light);
-  color: var(--uaf-primary);
-  font-weight: 500;
-}
-.nav__link-indicator {
+/* ═══════════════════════ 2. Backoffice components (our own markup) ═══════════════════════ */
+
+/* ── Sidebar (BackofficeNav) — MenuList/NavGroup/NavItem/NavCollapse ── */
+.uaf-nav {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: var(--nav-width);
   display: none;
+  flex-direction: column;
+  background: var(--uaf-paper);
 }
-html[data-theme='dark'] .nav__link:hover,
-html[data-theme='dark'] .nav__link.active,
-html[data-theme='dark'] .nav__link:has(.nav__link-indicator) {
-  background: var(--theme-elevation-150);
+.uaf-nav--open {
+  display: flex;
+}
+.uaf-nav__brand {
+  height: var(--app-header-height);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding-inline-start: 26px;
+}
+.uaf-nav__brand img {
+  display: block;
+  height: auto;
+}
+.uaf-nav__scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px 24px;
+}
+.uaf-nav__caption {
+  margin: 10px 0 6px;
+  padding: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--uaf-grey-900);
+}
+.uaf-nav__divider {
+  border: 0;
+  border-top: 1px solid var(--uaf-grey-200);
+  margin: 2px 0 10px;
+}
+.uaf-nav__link {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  min-height: 48px;
+  margin: 0 0 4px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: var(--uaf-radius);
+  background: transparent;
+  color: var(--uaf-grey-700);
+  font: inherit;
+  font-size: 14px;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+.uaf-nav__link:hover,
+.uaf-nav__link--active {
+  background: var(--uaf-gold-light);
+  color: var(--uaf-gold-dark);
+}
+.uaf-nav__link--active .uaf-nav__label {
+  font-weight: 500;
+  color: var(--uaf-grey-900);
+}
+.uaf-nav__icon {
+  display: inline-flex;
+  align-items: center;
+  min-width: 36px;
+  color: var(--uaf-grey-700);
+}
+.uaf-nav__link:hover .uaf-nav__icon,
+.uaf-nav__link--active .uaf-nav__icon {
+  color: var(--uaf-gold-dark);
+}
+.uaf-nav__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--uaf-grey-900);
+  line-height: 1.334em;
+}
+.uaf-nav__chevron {
+  display: inline-flex;
+}
+.uaf-nav__badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  margin-inline: 6px auto;
+  border-radius: 10px;
+  background: var(--uaf-error);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+}
+.uaf-nav__children {
+  position: relative;
+  margin-bottom: 4px;
+}
+.uaf-nav__children::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: 25px;
+  top: 0;
+  height: 100%;
+  width: 1px;
+  background: var(--uaf-primary-light);
+  opacity: 0.4;
+}
+.uaf-nav__link--nested {
+  min-height: 40px;
+  padding-block: 8px;
+  padding-inline-start: 36px;
+}
+.uaf-nav__link--nested:hover,
+.uaf-nav__link--nested.uaf-nav__link--active {
+  background: transparent;
+}
+.uaf-nav__link--nested.uaf-nav__link--active .uaf-nav__label {
+  color: var(--uaf-gold-dark);
+}
+.uaf-nav__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.uaf-nav__link--nested.uaf-nav__link--active .uaf-nav__dot {
+  width: 8px;
+  height: 8px;
+}
+
+/* ── Hamburger (BackofficeShell) — Header/index.jsx: light-gold square next to the logo ── */
+.uaf-hamburger {
+  position: fixed;
+  top: 27px;
+  inset-inline-start: 24px;
+  z-index: 30;
+}
+.uaf-hamburger--nav-open {
+  inset-inline-start: 236px; /* Header/index.jsx: logo box 228px + toolbar gutter */
+}
+
+/* ── Header actions — Header/NotificationSection, Header/ProfileSection ── */
+.uaf-header-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.uaf-square-button {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--uaf-radius);
+  background: var(--uaf-gold-light);
+  color: var(--uaf-gold-dark);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.uaf-square-button:hover {
+  background: var(--uaf-gold-dark);
+  color: var(--uaf-gold-light);
+}
+.uaf-account-pill {
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px 0 8px;
+  border: 0;
+  border-radius: 27px;
+  background: var(--uaf-primary-light);
+  color: var(--uaf-grey-100);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.uaf-account-pill:hover {
+  background: var(--uaf-primary);
+}
+.uaf-account-pill__avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--uaf-grey-300);
+  color: var(--uaf-primary);
+}
+.uaf-popover {
+  position: absolute;
+  inset-inline-end: 0;
+  top: calc(100% + 10px);
+  z-index: 50;
+  min-width: 240px;
+  padding: 16px;
+  border-radius: var(--uaf-radius);
+  background: var(--uaf-paper);
+  box-shadow: var(--uaf-shadow-z8);
+}
+.uaf-popover--menu {
+  min-width: 140px;
+  padding: 6px;
+}
+.uaf-popover__title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--uaf-grey-900);
+}
+.uaf-popover__empty {
+  margin: 0;
+  color: var(--uaf-grey-500);
+}
+.uaf-popover__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--uaf-radius);
+  background: transparent;
+  color: var(--uaf-grey-700);
+  font: inherit;
+  font-size: 14px;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+.uaf-popover__item:hover {
+  background: var(--uaf-gold-light);
+  color: var(--uaf-gold-dark);
+}
+.uaf-popover__item--danger:hover {
+  background: #fdecea;
+  color: var(--uaf-error-dark);
+}
+
+/* ── Footer — mainLayout/Footer.jsx ── */
+.uaf-footer {
+  padding: 24px 0 0;
+  font-size: 12px;
+  color: var(--uaf-grey-500);
+}
+.uaf-footer a {
+  color: var(--uaf-gold);
+  text-decoration: none;
+}
+.uaf-footer a:hover {
+  text-decoration: underline;
+}
+
+/* ── Floating "Live Customize" button + drawer — views/customization ── */
+.uaf-customize-fab {
+  position: fixed;
+  bottom: 15%;
+  inset-inline-end: 10px;
+  z-index: 1200;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50% 50% 4px 50%;
+  background: var(--uaf-gold);
+  color: var(--uaf-grey-900);
+  box-shadow: var(--uaf-shadow-gold);
+  cursor: pointer;
+}
+.uaf-customize-fab svg {
+  animation: uaf-rotate 4s linear infinite;
+}
+@keyframes uaf-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.uaf-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  border: 0;
+  background: rgb(18 25 38 / 50%);
+}
+.uaf-drawer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  inset-inline-end: 0;
+  z-index: 1301;
+  width: 280px;
+  background: var(--uaf-paper);
+  box-shadow: var(--uaf-shadow-z8);
+  overflow-y: auto;
+}
+.uaf-drawer__section {
+  padding: 24px;
+  border-bottom: 1px solid var(--uaf-grey-200);
+}
+.uaf-drawer__section h2 {
+  margin: 0 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--uaf-grey-900);
+}
+.uaf-drawer__font {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--uaf-grey-200);
+  border-radius: var(--uaf-radius);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.uaf-drawer__font input {
+  position: absolute;
+  opacity: 0;
+}
+.uaf-drawer__font--selected {
+  border-color: var(--uaf-gold);
+  background: var(--uaf-gold-light);
+}
+.uaf-drawer__radius {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--uaf-grey-500);
+}
+.uaf-drawer__radius input {
+  flex: 1;
+  accent-color: var(--uaf-gold);
+}
+
+/* ── Dashboard: "Total Users" card — views/dashboard/Default/TotalUsers.jsx ── */
+.uaf-dashboard {
+  display: grid;
+  align-items: start;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* Default/index.jsx: Grid lg 4 of 12, spacing 3 */
+  gap: 24px;
+}
+@media (max-width: 1200px) {
+  .uaf-dashboard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.uaf-stat-card {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  min-height: 205px;
+  border-radius: var(--uaf-radius);
+  background: var(--uaf-gold-dark);
   color: #fff;
 }
-
-/* ───────────────────────────── Header ───────────────────────────── */
-.app-header {
-  background: var(--theme-elevation-0);
-  border-bottom: 1px solid var(--theme-elevation-150);
+.uaf-stat-card::after,
+.uaf-stat-card::before {
+  content: '';
+  position: absolute;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: var(--uaf-gold-800);
+}
+.uaf-stat-card::after {
+  top: -85px;
+  inset-inline-end: -95px;
+}
+.uaf-stat-card::before {
+  top: -125px;
+  inset-inline-end: -15px;
+  opacity: 0.5;
+}
+.uaf-stat-card__icon {
+  position: relative;
+  z-index: 1;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+  border-radius: 8px;
+  background: var(--uaf-gold-800);
+  color: #fff;
+}
+.uaf-stat-card__value {
+  position: relative;
+  z-index: 1;
+  margin: 14px 0 6px;
+  font-size: 34px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.uaf-stat-card__label {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--uaf-gold-200);
 }
 
-/* ───────────────────────────── Cards, tables, fields ───────────────────────────── */
-.card,
-.collection-list .table-wrap,
-.table-wrap,
-.collapsible,
-.drawer__content,
-.popup__content {
-  border-radius: 12px;
+/* ── Coming soon ── */
+.uaf-coming-soon {
+  padding: 24px;
+  border-radius: var(--uaf-radius);
+  background: var(--uaf-paper);
 }
-.card {
-  background: var(--theme-elevation-0);
-  border: 1px solid var(--theme-elevation-100);
-  box-shadow: var(--uaf-card-shadow);
-  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+.uaf-coming-soon h1 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--uaf-grey-900);
 }
-.card:hover {
-  border-color: var(--uaf-gold);
-  box-shadow: 0 4px 20px 0 rgb(212 175 55 / 18%);
+.uaf-coming-soon p {
+  margin: 0;
+  color: var(--uaf-grey-500);
 }
-.table table {
-  background: var(--theme-elevation-0);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: var(--uaf-card-shadow);
+
+/* ── Login — views/authentication (AuthWrapper / AuthCardWrapper / AuthLogin) ── */
+.uaf-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--uaf-grey-100);
 }
-.table thead th {
-  background: var(--theme-elevation-50);
-  color: var(--theme-elevation-600);
-  font-size: 12px;
+.uaf-login__card {
+  width: 100%;
+  max-width: 475px;
+  padding: 40px 40px 34px;
+  border-radius: var(--uaf-radius);
+  background: var(--uaf-paper);
+  text-align: center;
+}
+.uaf-login__logo {
+  display: block;
+  height: auto;
+  margin: 0 auto 16px;
+}
+.uaf-login__title {
+  margin: 0 0 8px;
+  font-size: 24px;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  color: var(--uaf-gold);
 }
-.table tbody tr:hover {
-  background: var(--theme-elevation-50);
+.uaf-login__subtitle {
+  margin: 0 0 40px;
+  font-size: 16px;
+  color: var(--uaf-grey-500);
 }
+.uaf-login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  text-align: start;
+}
+.uaf-login__error {
+  margin: -8px 0 0;
+  color: var(--uaf-error);
+  font-size: 12px;
+}
+/* MUI-style outlined text field with a floating label */
+.uaf-outlined {
+  position: relative;
+  display: block;
+}
+.uaf-outlined input {
+  width: 100%;
+  height: 56px;
+  padding: 15.5px 14px;
+  border: 1px solid #bdbdbd;
+  border-radius: var(--uaf-radius);
+  background: transparent;
+  color: var(--uaf-grey-900);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  outline: none;
+}
+.uaf-outlined--with-button input {
+  padding-inline-end: 52px;
+}
+.uaf-outlined input:hover {
+  border-color: var(--uaf-primary-light);
+}
+.uaf-outlined input:focus {
+  border: 2px solid var(--uaf-primary);
+  padding: 14.5px 13px;
+}
+.uaf-outlined__label {
+  position: absolute;
+  inset-inline-start: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0 4px;
+  margin-inline-start: -4px;
+  background: var(--uaf-paper);
+  color: var(--uaf-grey-500);
+  font-size: 16px;
+  pointer-events: none;
+  transition: all 0.15s ease;
+}
+.uaf-outlined--filled .uaf-outlined__label,
+.uaf-outlined input:focus + .uaf-outlined__label {
+  top: 0;
+  font-size: 12px;
+}
+.uaf-outlined input:focus + .uaf-outlined__label {
+  color: var(--uaf-primary);
+}
+.uaf-outlined__button {
+  position: absolute;
+  inset-inline-end: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--uaf-grey-700);
+  cursor: pointer;
+}
+.uaf-outlined__button:hover {
+  background: rgb(0 0 0 / 4%);
+}
+.uaf-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--uaf-grey-900);
+  cursor: pointer;
+}
+.uaf-checkbox input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--uaf-primary);
+}
+.uaf-gold-button {
+  height: 48px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--uaf-gold);
+  color: var(--uaf-grey-900);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  box-shadow: 0 3px 1px -2px rgb(0 0 0 / 20%), 0 2px 2px 0 rgb(0 0 0 / 14%), 0 1px 5px 0 rgb(0 0 0 / 12%);
+  cursor: pointer;
+}
+.uaf-gold-button:hover {
+  background: var(--uaf-gold-dark);
+}
+.uaf-gold-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ── Languages list: switch, row actions, export — layout/helper.jsx CustomSwitch, CustomMaterialTable ── */
+.uaf-switch {
+  position: relative;
+  width: 40px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 13px;
+  background: #e9e9ea;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.uaf-switch[aria-checked='true'] {
+  background: #65c466;
+}
+.uaf-switch:disabled {
+  opacity: 0.6;
+}
+.uaf-switch__thumb {
+  position: absolute;
+  top: 2px;
+  inset-inline-start: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+  transition: inset-inline-start 0.3s;
+}
+.uaf-switch[aria-checked='true'] .uaf-switch__thumb {
+  inset-inline-start: 22px;
+}
+.uaf-row-actions {
+  position: relative;
+  display: inline-block;
+}
+.uaf-icon-button {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--uaf-grey-700);
+  cursor: pointer;
+}
+.uaf-icon-button:hover {
+  background: rgb(0 0 0 / 4%);
+}
+.uaf-list-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+.uaf-outline-button {
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--uaf-primary);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--uaf-primary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.uaf-outline-button:hover {
+  background: rgb(47 76 104 / 4%);
+}
+
+/* ═══════════════════════ 3. Payload internals — MAY BREAK ON UPGRADE (Payload 3.90.2) ═══════════════════════
+ * No supported API exists for these. Each selector is listed in the spike report. */
+
+/* Header bar: production's 88px white bar, no border; breadcrumbs and Payload's account avatar hidden (production has neither). */
+.app-header {
+  height: var(--app-header-height);
+  background: var(--uaf-paper);
+  border-bottom: 0;
+}
+.app-header .step-nav,
+.app-header__account {
+  display: none;
+}
+
+/* Hamburger: Payload's own nav toggler is hidden; BackofficeShell renders production's (same open/close state, useNav). */
+.template-default__nav-toggler-wrapper {
+  display: none;
+}
+
+/* Login: the replacement login view fills the page (Payload still wraps it in its minimal template). */
+.template-minimal {
+  padding: 0;
+  background: var(--uaf-grey-100);
+}
+.template-minimal__wrap {
+  max-width: none;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+}
+
+/* Content area: production's light-gold rounded panel inside the white page (MainContentStyled.js: 88px from the top, 20px
+   from the right and bottom, radius 8, padding 20). Drawn once behind every view, whatever elements the view renders.
+   ::after, because Payload uses ::before for its mobile nav overlay. */
+.template-default__wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-inline-end: 20px;
+  padding-bottom: 20px;
+}
+.template-default__wrap::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: var(--app-header-height);
+  bottom: 20px;
+  inset-inline: 0 20px;
+  border-radius: var(--uaf-radius);
+  background: var(--uaf-gold-light);
+  pointer-events: none;
+}
+.template-default__wrap > :not(.app-header) {
+  position: relative;
+  z-index: 1;
+}
+.template-default__wrap > :nth-child(2) {
+  padding-top: 20px;
+}
+.template-default__wrap > :not(.app-header) {
+  padding-inline: 20px;
+}
+.template-default__wrap > .uaf-footer {
+  margin-top: auto;
+  padding-bottom: 0;
+}
+/* Payload's own gutters inside a view: the panel's 20px padding replaces them. */
+.template-default__wrap > * .gutter--left {
+  padding-inline-start: 0;
+}
+.template-default__wrap > * .gutter--right {
+  padding-inline-end: 0;
+}
+.template-default__wrap > .gutter--left,
+.template-default__wrap > .gutter--right {
+  padding-inline: 20px;
+}
+.doc-controls,
+.doc-header,
+.collection-edit__main-wrapper {
+  background: transparent;
+}
+
+/* Buttons: production's primary (navy) contained buttons and outlined secondaries. */
+.btn--style-primary {
+  --bg-color: var(--uaf-primary);
+  --color: #fff;
+  --hover-bg: var(--uaf-primary-dark);
+  --hover-color: #fff;
+}
+.btn--style-secondary {
+  --btn-border: 1px solid var(--uaf-primary);
+  --color: var(--uaf-primary);
+  --hover-color: var(--uaf-primary);
+}
+.btn {
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Fields: MUI outlined look. */
 .field-type input,
 .field-type textarea,
 .field-type .rs__control {
-  border-radius: 8px;
+  border-radius: var(--uaf-radius);
+  border-color: #bdbdbd;
 }
 .field-type input:focus,
 .field-type textarea:focus,
 .field-type .rs__control--is-focused {
-  border-color: var(--uaf-gold);
-  box-shadow: 0 0 0 3px rgb(212 175 55 / 20%);
-}
-.checkbox-input__input.checkbox-input__input--checked,
-.checkbox-input__input[data-checked='true'] {
-  background: var(--uaf-primary);
   border-color: var(--uaf-primary);
+  box-shadow: inset 0 0 0 1px var(--uaf-primary);
+}
+.field-label .required {
+  color: var(--uaf-error);
 }
 
-/* ───────────────────────────── Login / minimal template ───────────────────────────── */
-.template-minimal {
-  background: linear-gradient(160deg, #eef2f6 0%, #e3e8ef 100%);
+/* List view: CustomMaterialTable — white card, #f5f5f5 header, zebra rows. */
+.collection-list .table {
+  border-radius: var(--uaf-radius);
+  background: var(--uaf-paper);
+  overflow: visible; /* the row ⋮ menu must not be clipped on the last row */
 }
-html[data-theme='dark'] .template-minimal {
-  background: linear-gradient(160deg, #111936 0%, #1a223f 100%);
+/* The cell holding an open row menu sits above the following rows. */
+.collection-list .table td:has(.uaf-popover) {
+  position: relative;
+  z-index: 10;
 }
-.template-minimal__wrap {
-  background: var(--theme-elevation-0);
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 8px 32px 0 rgb(32 40 45 / 12%);
+.collection-list .table table thead th {
+  background: #f5f5f5;
+  color: var(--uaf-grey-900);
+  font-size: 14px;
+  font-weight: 500;
+}
+.collection-list .table table tbody tr:nth-child(odd) td {
+  background: #ffffff;
+}
+.collection-list .table table tbody tr:nth-child(even) td {
+  background: #f5f5f5;
+}
+.collection-list .table table td,
+.collection-list .table table th {
+  border-color: var(--uaf-grey-200);
 }
 
-/* Logo artwork has dark-navy text — sit it on a white plate in dark mode. */
-html[data-theme='dark'] .uaf-logo {
-  background: #fff;
-  padding: 12px 24px;
-  border-radius: 12px;
+/* Languages edit form: production's label-left (4/12) / field-right (8/12) grid on a white card. */
+.collection-edit--languages .document-fields__main {
+  background: var(--uaf-paper);
+  border-radius: var(--uaf-radius);
 }
-html[data-theme='dark'] .uaf-icon {
-  background: #fff;
-  padding: 3px 5px;
-  border-radius: 8px;
+.collection-edit--languages .render-fields > .field-type {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  align-items: center;
+  column-gap: 16px;
+}
+.collection-edit--languages .render-fields > .field-type > .field-label {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--uaf-grey-900);
+}
+.collection-edit--languages .render-fields > .field-type > :not(.field-label) {
+  grid-column: 2;
 }
