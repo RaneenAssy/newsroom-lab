@@ -72,16 +72,16 @@ export interface Config {
     permissions: Permission;
     'staff-departments': StaffDepartment;
     users: User;
-    languages: Language;
+    'user-subscriptions': UserSubscription;
     products: Product;
     'billing-products': BillingProduct;
-    'user-subscriptions': UserSubscription;
     news: News;
     comments: Comment;
     'news-categories': NewsCategory;
     'news-topics': NewsTopic;
     'news-hub-chips': NewsHubChip;
     'article-audit-logs': ArticleAuditLog;
+    languages: Language;
     media: Media;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -95,16 +95,16 @@ export interface Config {
     permissions: PermissionsSelect<false> | PermissionsSelect<true>;
     'staff-departments': StaffDepartmentsSelect<false> | StaffDepartmentsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
-    languages: LanguagesSelect<false> | LanguagesSelect<true>;
+    'user-subscriptions': UserSubscriptionsSelect<false> | UserSubscriptionsSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     'billing-products': BillingProductsSelect<false> | BillingProductsSelect<true>;
-    'user-subscriptions': UserSubscriptionsSelect<false> | UserSubscriptionsSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
     comments: CommentsSelect<false> | CommentsSelect<true>;
     'news-categories': NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
     'news-topics': NewsTopicsSelect<false> | NewsTopicsSelect<true>;
     'news-hub-chips': NewsHubChipsSelect<false> | NewsHubChipsSelect<true>;
     'article-audit-logs': ArticleAuditLogsSelect<false> | ArticleAuditLogsSelect<true>;
+    languages: LanguagesSelect<false> | LanguagesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -349,16 +349,25 @@ export interface Product {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "languages".
+ * via the `definition` "user-subscriptions".
  */
-export interface Language {
+export interface UserSubscription {
   id: string;
-  name: string;
-  code: string;
-  appLangCode: string;
-  rtl?: boolean | null;
-  flagImg?: (string | null) | Media;
-  status?: boolean | null;
+  user: string | User;
+  product: string | Product;
+  environment: 'test' | 'live';
+  interval: 'month' | 'year';
+  country: string;
+  vatRate?: number | null;
+  startDate: string;
+  endDate: string;
+  billingPeriodAnchor: string;
+  lifecycleState?: ('active' | 'past_due' | 'cancelled' | 'lapsed' | 'superseded' | 'refunded') | null;
+  billingStatus?: ('success' | 'renewed' | 'past_due' | 'failed' | 'cancelled' | 'refunded') | null;
+  accessRevokedAt?: string | null;
+  accessEndsAt?: string | null;
+  supersededAt?: string | null;
+  supersededBy?: (string | null) | UserSubscription;
   updatedAt: string;
   createdAt: string;
 }
@@ -390,30 +399,6 @@ export interface BillingProduct {
    */
   vatRate: number;
   isActive?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "user-subscriptions".
- */
-export interface UserSubscription {
-  id: string;
-  user: string | User;
-  product: string | Product;
-  environment: 'test' | 'live';
-  interval: 'month' | 'year';
-  country: string;
-  vatRate?: number | null;
-  startDate: string;
-  endDate: string;
-  billingPeriodAnchor: string;
-  lifecycleState?: ('active' | 'past_due' | 'cancelled' | 'lapsed' | 'superseded' | 'refunded') | null;
-  billingStatus?: ('success' | 'renewed' | 'past_due' | 'failed' | 'cancelled' | 'refunded') | null;
-  accessRevokedAt?: string | null;
-  accessEndsAt?: string | null;
-  supersededAt?: string | null;
-  supersededBy?: (string | null) | UserSubscription;
   updatedAt: string;
   createdAt: string;
 }
@@ -764,6 +749,21 @@ export interface ArticleAuditLog {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "languages".
+ */
+export interface Language {
+  id: string;
+  name: string;
+  code: string;
+  appLangCode: string;
+  rtl: '1' | '0';
+  status: 'active' | 'inactive';
+  flagImg: string | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -807,8 +807,8 @@ export interface PayloadLockedDocument {
         value: string | User;
       } | null)
     | ({
-        relationTo: 'languages';
-        value: string | Language;
+        relationTo: 'user-subscriptions';
+        value: string | UserSubscription;
       } | null)
     | ({
         relationTo: 'products';
@@ -817,10 +817,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'billing-products';
         value: string | BillingProduct;
-      } | null)
-    | ({
-        relationTo: 'user-subscriptions';
-        value: string | UserSubscription;
       } | null)
     | ({
         relationTo: 'news';
@@ -845,6 +841,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'article-audit-logs';
         value: string | ArticleAuditLog;
+      } | null)
+    | ({
+        relationTo: 'languages';
+        value: string | Language;
       } | null)
     | ({
         relationTo: 'media';
@@ -1014,15 +1014,24 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "languages_select".
+ * via the `definition` "user-subscriptions_select".
  */
-export interface LanguagesSelect<T extends boolean = true> {
-  name?: T;
-  code?: T;
-  appLangCode?: T;
-  rtl?: T;
-  flagImg?: T;
-  status?: T;
+export interface UserSubscriptionsSelect<T extends boolean = true> {
+  user?: T;
+  product?: T;
+  environment?: T;
+  interval?: T;
+  country?: T;
+  vatRate?: T;
+  startDate?: T;
+  endDate?: T;
+  billingPeriodAnchor?: T;
+  lifecycleState?: T;
+  billingStatus?: T;
+  accessRevokedAt?: T;
+  accessEndsAt?: T;
+  supersededAt?: T;
+  supersededBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1061,29 +1070,6 @@ export interface BillingProductsSelect<T extends boolean = true> {
   amount?: T;
   vatRate?: T;
   isActive?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "user-subscriptions_select".
- */
-export interface UserSubscriptionsSelect<T extends boolean = true> {
-  user?: T;
-  product?: T;
-  environment?: T;
-  interval?: T;
-  country?: T;
-  vatRate?: T;
-  startDate?: T;
-  endDate?: T;
-  billingPeriodAnchor?: T;
-  lifecycleState?: T;
-  billingStatus?: T;
-  accessRevokedAt?: T;
-  accessEndsAt?: T;
-  supersededAt?: T;
-  supersededBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1326,6 +1312,20 @@ export interface ArticleAuditLogsSelect<T extends boolean = true> {
         after?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "languages_select".
+ */
+export interface LanguagesSelect<T extends boolean = true> {
+  name?: T;
+  code?: T;
+  appLangCode?: T;
+  rtl?: T;
+  status?: T;
+  flagImg?: T;
   updatedAt?: T;
   createdAt?: T;
 }

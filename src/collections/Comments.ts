@@ -41,7 +41,7 @@ export const Comments: CollectionConfig = {
   labels: { singular: 'Comment', plural: 'Comments' },
   admin: {
     useAsTitle: 'excerpt',
-    group: 'News',
+    group: 'News Management',
     defaultColumns: ['excerpt', 'author', 'article', 'status', 'createdAt'],
     listSearchableFields: ['body'],
     description: 'Reader comments from article pages. They appear on the site immediately; set Status to Hidden to take one down.',

@@ -4,7 +4,7 @@ import { authenticated, hasPermission } from '../access'
 export const NewsCategories: CollectionConfig = {
   slug: 'news-categories',
   labels: { singular: 'News Category', plural: 'News Categories' },
-  admin: { useAsTitle: 'name', group: 'News', defaultColumns: ['name', 'nameAr', 'slug', 'status', 'defaultCategory'] },
+  admin: { useAsTitle: 'name', group: 'News Management', defaultColumns: ['name', 'nameAr', 'slug', 'status', 'defaultCategory'] },
   access: {
     read: authenticated,
     create: hasPermission('add_news_category'),

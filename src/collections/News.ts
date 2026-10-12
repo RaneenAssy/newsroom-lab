@@ -109,7 +109,7 @@ export const News: CollectionConfig = {
   labels: { singular: 'News Article', plural: 'News' },
   admin: {
     useAsTitle: 'title',
-    group: 'News',
+    group: 'News Management',
     defaultColumns: ['title', 'mainCategory', 'lang', 'status', 'publishedAt', 'postEnrichmentStatus'],
     listSearchableFields: ['title', 'slug', 'source'],
     // Live Preview: the article rendered as readers would see it, updating while staff type (see src/app/(preview)).

@@ -6,7 +6,7 @@ export const Products: CollectionConfig = {
   labels: { singular: 'Subscription Plan', plural: 'Subscription Plans' },
   admin: {
     useAsTitle: 'name',
-    group: 'Subscriptions',
+    group: 'Billing Management',
     defaultColumns: ['name', 'subscriptionType', 'interval', 'topN', 'status'],
   },
   access: { read: () => true, create: authenticated, update: authenticated, delete: authenticated },

@@ -1,256 +1,258 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
 /*
- * UA Finance backoffice theme — ported from apps/backend (Berry/MUI):
- *   primary   #2F4C68 (deep blue-gray)   secondary  #D4AF37 (gold)
- *   greys     #f8fafc → #121926          radius 8px, Roboto
- * Payload's own styles live in `@layer payload-default`, so these unlayered rules win.
+ * UA Finance colours for Payload's built-in admin (Payload 3.90.2).
+ * Source of truth: ua-finances apps/backend/src/assets/scss/_themes-vars.module.scss (colours), src/config.js (Roboto, radius 8).
+ *
+ * The layout, sidebar, header, login, dashboard and list/edit views are Payload's own. This file only:
+ *   1. sets Payload's documented theme variables (--color-*, --theme-*, --font-body, --style-radius-*) to production's palette;
+ *   2. recolours a few Payload classes where a brand colour has no variable (each marked "Payload class": may change on upgrade);
+ *   3. styles the two small slot components (login greeting, Total Users card).
+ * Payload's styles live in `@layer payload-default`; everything here is unlayered, so it wins without !important.
  */
 
+/* ═══════════════════════ 1. Palette and Payload theme variables ═══════════════════════ */
 :root {
+  /* production palette (_themes-vars.module.scss), exact values */
+  --uaf-paper: #ffffff;
+  --uaf-primary-light: #5c7c9e;
   --uaf-primary: #2f4c68;
   --uaf-primary-dark: #314557;
-  --uaf-primary-light: #5c7c9e;
   --uaf-primary-200: #8ba2b8;
+  --uaf-primary-800: #173957;
+  --uaf-gold-light: #fff5d2;
   --uaf-gold: #d4af37;
   --uaf-gold-dark: #a8872b;
-  --uaf-gold-light: #fff5d2;
-  --uaf-card-shadow: 0 2px 14px 0 rgb(32 40 45 / 8%);
+  --uaf-gold-200: #f1da89;
+  --uaf-gold-800: #7a6a1e;
+  --uaf-success-light: #b9f6ca;
+  --uaf-success-200: #69f0ae;
+  --uaf-success: #00e676;
+  --uaf-success-dark: #00c853;
+  --uaf-error-light: #ef9a9a;
+  --uaf-error: #f44336;
+  --uaf-error-dark: #c62828;
+  --uaf-warning-light: #fff8e1;
+  --uaf-warning: #ffe57f;
+  --uaf-warning-dark: #ffc107;
+  --uaf-grey-50: #f8fafc;
+  --uaf-grey-100: #eef2f6;
+  --uaf-grey-200: #e3e8ef;
+  --uaf-grey-300: #cdd5df;
+  --uaf-grey-500: #697586;
+  --uaf-grey-600: #4b5565;
+  --uaf-grey-700: #364152;
+  --uaf-grey-900: #121926;
 
+  /*
+   * Payload's neutral scale (--color-base-0…1000) mapped onto production's greys. Steps production defines are exact; the steps
+   * in between are mixes of their two neighbours. 750–850, Payload's "strong" steps (primary buttons, checked boxes, selected
+   * states), are production's primary navy shades.
+   */
+  --color-base-0: var(--uaf-paper);
+  --color-base-50: var(--uaf-grey-50);
+  --color-base-100: var(--uaf-grey-100);
+  --color-base-150: color-mix(in srgb, var(--uaf-grey-100), var(--uaf-grey-200));
+  --color-base-200: var(--uaf-grey-200);
+  --color-base-250: color-mix(in srgb, var(--uaf-grey-200), var(--uaf-grey-300));
+  --color-base-300: var(--uaf-grey-300);
+  --color-base-350: color-mix(in srgb, var(--uaf-grey-300) 75%, var(--uaf-grey-500));
+  --color-base-400: color-mix(in srgb, var(--uaf-grey-300), var(--uaf-grey-500));
+  --color-base-450: color-mix(in srgb, var(--uaf-grey-300) 25%, var(--uaf-grey-500));
+  --color-base-500: var(--uaf-grey-500);
+  --color-base-550: color-mix(in srgb, var(--uaf-grey-500), var(--uaf-grey-600));
+  --color-base-600: var(--uaf-grey-600);
+  --color-base-650: color-mix(in srgb, var(--uaf-grey-600), var(--uaf-grey-700));
+  --color-base-700: var(--uaf-grey-700);
+  --color-base-750: var(--uaf-primary-dark);
+  --color-base-800: var(--uaf-primary);
+  --color-base-850: var(--uaf-primary-800);
+  --color-base-900: var(--uaf-grey-900);
+  --color-base-950: var(--uaf-grey-900);
+  --color-base-1000: var(--uaf-grey-900);
+
+  /* success: production's greens (light, 200, main, dark exact; outer steps mixed with white/black) */
+  --color-success-50: color-mix(in srgb, var(--uaf-success-light) 30%, white);
+  --color-success-100: color-mix(in srgb, var(--uaf-success-light) 60%, white);
+  --color-success-150: var(--uaf-success-light);
+  --color-success-200: var(--uaf-success-200);
+  --color-success-250: color-mix(in srgb, var(--uaf-success-200), var(--uaf-success));
+  --color-success-300: var(--uaf-success);
+  --color-success-350: var(--uaf-success);
+  --color-success-400: var(--uaf-success);
+  --color-success-450: color-mix(in srgb, var(--uaf-success), var(--uaf-success-dark));
+  --color-success-500: var(--uaf-success-dark);
+  --color-success-550: color-mix(in srgb, var(--uaf-success-dark) 90%, black);
+  --color-success-600: color-mix(in srgb, var(--uaf-success-dark) 80%, black);
+  --color-success-650: color-mix(in srgb, var(--uaf-success-dark) 72%, black);
+  --color-success-700: color-mix(in srgb, var(--uaf-success-dark) 64%, black);
+  --color-success-750: color-mix(in srgb, var(--uaf-success-dark) 56%, black);
+  --color-success-800: color-mix(in srgb, var(--uaf-success-dark) 48%, black);
+  --color-success-850: color-mix(in srgb, var(--uaf-success-dark) 40%, black);
+  --color-success-900: color-mix(in srgb, var(--uaf-success-dark) 32%, black);
+  --color-success-950: color-mix(in srgb, var(--uaf-success-dark) 24%, black);
+
+  /* error: production's reds */
+  --color-error-50: color-mix(in srgb, var(--uaf-error-light) 15%, white);
+  --color-error-100: color-mix(in srgb, var(--uaf-error-light) 30%, white);
+  --color-error-150: color-mix(in srgb, var(--uaf-error-light) 50%, white);
+  --color-error-200: color-mix(in srgb, var(--uaf-error-light) 75%, white);
+  --color-error-250: var(--uaf-error-light);
+  --color-error-300: var(--uaf-error-light);
+  --color-error-350: color-mix(in srgb, var(--uaf-error-light) 66%, var(--uaf-error));
+  --color-error-400: color-mix(in srgb, var(--uaf-error-light) 33%, var(--uaf-error));
+  --color-error-450: var(--uaf-error);
+  --color-error-500: var(--uaf-error);
+  --color-error-550: color-mix(in srgb, var(--uaf-error), var(--uaf-error-dark));
+  --color-error-600: var(--uaf-error-dark);
+  --color-error-650: color-mix(in srgb, var(--uaf-error-dark) 88%, black);
+  --color-error-700: color-mix(in srgb, var(--uaf-error-dark) 78%, black);
+  --color-error-750: color-mix(in srgb, var(--uaf-error-dark) 68%, black);
+  --color-error-800: color-mix(in srgb, var(--uaf-error-dark) 58%, black);
+  --color-error-850: color-mix(in srgb, var(--uaf-error-dark) 48%, black);
+  --color-error-900: color-mix(in srgb, var(--uaf-error-dark) 38%, black);
+  --color-error-950: color-mix(in srgb, var(--uaf-error-dark) 28%, black);
+
+  /* warning: production's ambers */
+  --color-warning-50: var(--uaf-warning-light);
+  --color-warning-100: var(--uaf-warning-light);
+  --color-warning-150: color-mix(in srgb, var(--uaf-warning-light), var(--uaf-warning));
+  --color-warning-200: var(--uaf-warning);
+  --color-warning-250: var(--uaf-warning);
+  --color-warning-300: color-mix(in srgb, var(--uaf-warning), var(--uaf-warning-dark));
+  --color-warning-350: var(--uaf-warning-dark);
+  --color-warning-400: var(--uaf-warning-dark);
+  --color-warning-450: color-mix(in srgb, var(--uaf-warning-dark) 90%, black);
+  --color-warning-500: color-mix(in srgb, var(--uaf-warning-dark) 80%, black);
+  --color-warning-550: color-mix(in srgb, var(--uaf-warning-dark) 72%, black);
+  --color-warning-600: color-mix(in srgb, var(--uaf-warning-dark) 64%, black);
+  --color-warning-650: color-mix(in srgb, var(--uaf-warning-dark) 56%, black);
+  --color-warning-700: color-mix(in srgb, var(--uaf-warning-dark) 50%, black);
+  --color-warning-750: color-mix(in srgb, var(--uaf-warning-dark) 44%, black);
+  --color-warning-800: color-mix(in srgb, var(--uaf-warning-dark) 38%, black);
+  --color-warning-850: color-mix(in srgb, var(--uaf-warning-dark) 32%, black);
+  --color-warning-900: color-mix(in srgb, var(--uaf-warning-dark) 26%, black);
+  --color-warning-950: color-mix(in srgb, var(--uaf-warning-dark) 20%, black);
+
+  /* type and shape: Roboto, radius 8 (config.js) */
   --font-body: 'Roboto', sans-serif;
-  --style-radius-s: 6px;
+  --style-radius-s: 4px;
   --style-radius-m: 8px;
-  --style-radius-l: 12px;
+  --style-radius-l: 8px;
 }
 
-/* ───────────────────────────── Light ───────────────────────────── */
+/* production: text.primary grey700, divider grey200, input background grey50 (themes/palette.jsx, compStyleOverride.jsx) */
 html[data-theme='light'] {
-  --theme-bg: #eef2f6;
-  --theme-text: #364152;
-  --theme-input-bg: #ffffff;
-  --theme-border-color: #e3e8ef;
-
-  --theme-elevation-0: #ffffff;
-  --theme-elevation-50: #f8fafc;
-  --theme-elevation-100: #eef2f6;
-  --theme-elevation-150: #e8edf3;
-  --theme-elevation-200: #e3e8ef;
-  --theme-elevation-250: #d9e0e9;
-  --theme-elevation-300: #cdd5df;
-  --theme-elevation-350: #b9c3d0;
-  --theme-elevation-400: #9aa4b2;
-  --theme-elevation-450: #8792a2;
-  --theme-elevation-500: #697586;
-  --theme-elevation-550: #5d6a7c;
-  --theme-elevation-600: #4b5565;
-  --theme-elevation-700: #364152;
-  --theme-elevation-750: #2c3646;
-  --theme-elevation-800: #2f4c68;
-  --theme-elevation-850: #212a38;
-  --theme-elevation-900: #1b2330;
-  --theme-elevation-950: #161d28;
-  --theme-elevation-1000: #121926;
-
-  --theme-success-500: #00c853;
-  --theme-error-500: #f44336;
-  --theme-warning-500: #ffc107;
+  --theme-text: var(--uaf-grey-700);
+  --theme-border-color: var(--uaf-grey-200);
+  --theme-input-bg: var(--uaf-grey-50);
 }
 
-/* ───────────────────────────── Dark (Berry navy) ───────────────────────────── */
-html[data-theme='dark'] {
-  --theme-bg: #111936;
-  --theme-text: #d7dcec;
-  --theme-input-bg: #1a223f;
-  --theme-border-color: #29314f;
+/* ═══════════════════════ 2. Brand colours on Payload classes (no variable exists for these) ═══════════════════════ */
 
-  --theme-elevation-0: #111936;
-  --theme-elevation-50: #1a223f;
-  --theme-elevation-100: #212946;
-  --theme-elevation-150: #29314f;
-  --theme-elevation-200: #323b5c;
-  --theme-elevation-250: #3b4568;
-  --theme-elevation-300: #4a5578;
-  --theme-elevation-350: #5a6689;
-  --theme-elevation-400: #6b789c;
-  --theme-elevation-450: #7684ad;
-  --theme-elevation-500: #8492c4;
-  --theme-elevation-550: #96a3d0;
-  --theme-elevation-600: #a9b5de;
-  --theme-elevation-700: #bdc8f0;
-  --theme-elevation-750: #c8d1f3;
-  --theme-elevation-800: #d7dcec;
-  --theme-elevation-850: #e1e5f3;
-  --theme-elevation-900: #eceffa;
-  --theme-elevation-950: #f5f7fd;
-  --theme-elevation-1000: #ffffff;
+/* Payload class: the content area is production's light-gold panel; the header stays white. */
+.template-default__wrap {
+  background-color: var(--uaf-gold-light);
+}
+.app-header {
+  background-color: var(--uaf-paper);
 }
 
-body {
-  font-family: var(--font-body);
-}
-
-/* ───────────────────────────── Buttons ───────────────────────────── */
+/* Payload class: buttons read component variables, so only colours change. Primary hover = primary dark. */
 .btn--style-primary {
-  --bg-color: var(--uaf-primary);
-  --color: #fff;
-  --hover-bg: var(--uaf-primary-light);
-  --hover-color: #fff;
-}
-html[data-theme='dark'] .btn--style-primary {
-  --bg-color: #2196f3;
-  --hover-bg: #1e88e5;
-}
-.btn--style-secondary {
-  --btn-border: 1px solid var(--uaf-primary);
-  --color: var(--uaf-primary);
-  --hover-color: var(--uaf-gold-dark);
-  --hover-btn-border: 1px solid var(--uaf-gold);
-}
-html[data-theme='dark'] .btn--style-secondary {
-  --btn-border: 1px solid var(--theme-elevation-300);
-  --color: var(--theme-elevation-800);
-}
-.btn {
-  border-radius: 8px;
-  font-weight: 500;
+  --hover-bg: var(--uaf-primary-dark);
 }
 
-/* ───────────────────────────── Links, focus, selection ───────────────────────────── */
-a:not(.btn):not(.nav__link):hover {
-  color: var(--uaf-gold-dark);
-}
-:focus-visible {
-  outline-color: var(--uaf-gold);
-}
-::selection {
-  background: var(--uaf-gold-light);
-  color: var(--uaf-primary-dark);
+/* Payload class: production's sign-in button is gold. */
+.login__form .btn--style-primary {
+  --bg-color: var(--uaf-gold);
+  --color: var(--uaf-grey-900);
+  --hover-bg: var(--uaf-gold-dark);
+  --hover-color: var(--uaf-grey-900);
 }
 
-/* ───────────────────────────── Sidebar ───────────────────────────── */
-.nav {
-  background: var(--theme-elevation-0);
-  border-right: 1px solid var(--theme-elevation-150);
-}
-.nav-group__toggle,
-.nav__label {
-  color: var(--theme-elevation-500);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.nav__link {
-  font-size: 14.5px;
-  line-height: 22px;
-  padding: 8px 14px;
-  border-radius: 8px;
-  margin-bottom: 2px;
-  width: 100%;
-  color: var(--theme-elevation-700);
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.nav__link:hover {
-  background: var(--uaf-gold-light);
-  color: var(--uaf-primary-dark);
+/* Payload class: the active sidebar link uses production's gold (indicator bar and text). */
+.nav__link-indicator {
+  background: var(--uaf-gold);
 }
 .nav__link.active,
 .nav__link:has(.nav__link-indicator) {
-  background: var(--uaf-gold-light);
-  color: var(--uaf-primary);
-  font-weight: 500;
-}
-.nav__link-indicator {
-  display: none;
-}
-html[data-theme='dark'] .nav__link:hover,
-html[data-theme='dark'] .nav__link.active,
-html[data-theme='dark'] .nav__link:has(.nav__link-indicator) {
-  background: var(--theme-elevation-150);
-  color: #fff;
+  color: var(--uaf-gold-dark);
 }
 
-/* ───────────────────────────── Header ───────────────────────────── */
-.app-header {
-  background: var(--theme-elevation-0);
-  border-bottom: 1px solid var(--theme-elevation-150);
-}
+/* ═══════════════════════ 3. Slot components ═══════════════════════ */
 
-/* ───────────────────────────── Cards, tables, fields ───────────────────────────── */
-.card,
-.collection-list .table-wrap,
-.table-wrap,
-.collapsible,
-.drawer__content,
-.popup__content {
-  border-radius: 12px;
+/* beforeLogin: LoginGreeting */
+.uaf-login-greeting {
+  margin-bottom: 24px;
+  text-align: center;
 }
-.card {
-  background: var(--theme-elevation-0);
-  border: 1px solid var(--theme-elevation-100);
-  box-shadow: var(--uaf-card-shadow);
-  transition: box-shadow 0.15s ease, border-color 0.15s ease;
-}
-.card:hover {
-  border-color: var(--uaf-gold);
-  box-shadow: 0 4px 20px 0 rgb(212 175 55 / 18%);
-}
-.table table {
-  background: var(--theme-elevation-0);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: var(--uaf-card-shadow);
-}
-.table thead th {
-  background: var(--theme-elevation-50);
-  color: var(--theme-elevation-600);
-  font-size: 12px;
+.uaf-login-greeting__title {
+  margin: 0 0 8px;
+  font-size: 24px;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  color: var(--uaf-gold);
 }
-.table tbody tr:hover {
-  background: var(--theme-elevation-50);
-}
-.field-type input,
-.field-type textarea,
-.field-type .rs__control {
-  border-radius: 8px;
-}
-.field-type input:focus,
-.field-type textarea:focus,
-.field-type .rs__control--is-focused {
-  border-color: var(--uaf-gold);
-  box-shadow: 0 0 0 3px rgb(212 175 55 / 20%);
-}
-.checkbox-input__input.checkbox-input__input--checked,
-.checkbox-input__input[data-checked='true'] {
-  background: var(--uaf-primary);
-  border-color: var(--uaf-primary);
+.uaf-login-greeting__subtitle {
+  margin: 0;
+  font-size: 16px;
+  color: var(--uaf-grey-500);
 }
 
-/* ───────────────────────────── Login / minimal template ───────────────────────────── */
-.template-minimal {
-  background: linear-gradient(160deg, #eef2f6 0%, #e3e8ef 100%);
-}
-html[data-theme='dark'] .template-minimal {
-  background: linear-gradient(160deg, #111936 0%, #1a223f 100%);
-}
-.template-minimal__wrap {
-  background: var(--theme-elevation-0);
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 8px 32px 0 rgb(32 40 45 / 12%);
-}
-
-/* Logo artwork has dark-navy text — sit it on a white plate in dark mode. */
-html[data-theme='dark'] .uaf-logo {
-  background: #fff;
-  padding: 12px 24px;
-  border-radius: 12px;
-}
-html[data-theme='dark'] .uaf-icon {
-  background: #fff;
-  padding: 3px 5px;
+/* beforeDashboard: TotalUsersCard (production's dark-gold "Total Users" card) */
+.uaf-total-users {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 360px;
+  margin-bottom: 32px;
+  padding: 20px;
   border-radius: 8px;
+  background: var(--uaf-gold-dark);
+  color: #fff;
+  text-decoration: none;
+}
+.uaf-total-users::before,
+.uaf-total-users::after {
+  content: '';
+  position: absolute;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: var(--uaf-gold-800);
+}
+.uaf-total-users::after {
+  top: -85px;
+  inset-inline-end: -95px;
+}
+.uaf-total-users::before {
+  top: -125px;
+  inset-inline-end: -15px;
+  opacity: 0.5;
+}
+.uaf-total-users > * {
+  position: relative;
+  z-index: 1;
+}
+.uaf-total-users__icon {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--uaf-gold-800);
+}
+.uaf-total-users__value {
+  margin-top: 8px;
+  font-size: 34px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.uaf-total-users__label {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--uaf-gold-200);
 }

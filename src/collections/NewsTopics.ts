@@ -12,7 +12,7 @@ export const NewsTopics: CollectionConfig = {
   labels: { singular: 'News Topic', plural: 'News Topics' },
   admin: {
     useAsTitle: 'name',
-    group: 'News',
+    group: 'News Management',
     defaultColumns: ['name', 'nameAr', 'slug', 'status', 'reviewStatus', 'origin'],
   },
   access: {

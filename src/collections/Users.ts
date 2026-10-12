@@ -16,7 +16,7 @@ export const Users: CollectionConfig = {
   labels: { singular: 'User', plural: 'Users' },
   admin: {
     useAsTitle: 'email',
-    group: 'Customers',
+    group: 'Users',
     defaultColumns: ['name', 'email', 'country', 'isSubscribed', 'isVerified', 'status'],
   },
   access: { read: authenticated, create: authenticated, update: authenticated, delete: authenticated },
