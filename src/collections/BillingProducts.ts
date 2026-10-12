@@ -6,7 +6,7 @@ export const BillingProducts: CollectionConfig = {
   labels: { singular: 'Plan Price', plural: 'Plan Prices' },
   admin: {
     useAsTitle: 'name',
-    group: 'Subscriptions',
+    group: 'Billing Management',
     defaultColumns: ['name', 'product', 'interval', 'country', 'currency', 'amount', 'isActive'],
     description: 'One price per plan + interval + currency + country.',
   },

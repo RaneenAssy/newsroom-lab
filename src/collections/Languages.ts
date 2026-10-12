@@ -1,9 +1,10 @@
-import type { CollectionConfig, Validate } from 'payload'
+import type { CollectionConfig } from 'payload'
 import { authenticated } from '../access'
 
 /**
  * Same fields, order, labels and required markers as production's LanguageForm (apps/backend/src/features/Forms/LanguageForm.jsx):
- * RTL is a "1"/"0" select and Status an Active/Inactive select, as in production.
+ * RTL is a "1"/"0" select and Status an Active/Inactive select, and the flag is required, as in production.
+ * List actions (status change, delete) use Payload's built-in row selection and bulk Edit / Delete.
  */
 export const RTL_OPTIONS = [
   { label: '1', value: '1' },
@@ -14,25 +15,14 @@ export const STATUS_OPTIONS = [
   { label: 'Inactive', value: 'inactive' },
 ]
 
-/**
- * Production requires a flag. Enforced for staff creating a language, and a flag can never be removed; older records without a
- * flag (and system seeding, which has no user) can still be saved — e.g. the status switch on the list only changes `status`.
- */
-const flagRequiredForStaff: Validate = (value, { req, operation, previousValue }) => {
-  if (value || !req.user) return true
-  if (operation === 'update' && !previousValue) return true
-  return 'Please upload a flag.'
-}
-
 export const Languages: CollectionConfig = {
   slug: 'languages',
   labels: { singular: 'Language', plural: 'Languages' },
   admin: {
     useAsTitle: 'name',
-    group: 'Site Setup',
-    defaultColumns: ['name', 'code', 'appLangCode', 'rtl', 'status', 'rowActions'],
+    group: 'Website Setup',
+    defaultColumns: ['name', 'code', 'appLangCode', 'rtl', 'status'],
     listSearchableFields: ['name', 'code', 'appLangCode'],
-    components: { beforeListTable: ['/components/backoffice/languages/ExportLanguagesButton#ExportLanguagesButton'] },
   },
   access: { read: () => true, create: authenticated, update: authenticated, delete: authenticated },
   fields: [
@@ -47,17 +37,14 @@ export const Languages: CollectionConfig = {
       defaultValue: 'active',
       label: 'Status',
       options: STATUS_OPTIONS,
-      admin: { placeholder: 'Select Status', components: { Cell: '/components/backoffice/languages/StatusSwitchCell#StatusSwitchCell' } },
+      admin: { placeholder: 'Select Status' },
     },
     {
       name: 'flagImg',
       type: 'upload',
       relationTo: 'media',
       label: 'Upload flag',
-      validate: flagRequiredForStaff, // required for staff saves; the marker comes from RequiredLabel
-      admin: { components: { Label: '/components/backoffice/languages/RequiredLabel#RequiredLabel' } },
+      required: true,
     },
-    // Row actions column (production's ⋮ menu: Edit / Delete). A UI field: nothing stored.
-    { name: 'rowActions', type: 'ui', label: 'Actions', admin: { components: { Cell: '/components/backoffice/languages/RowActionsCell#RowActionsCell' } } },
   ],
 }

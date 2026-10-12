@@ -6,7 +6,7 @@ export const UserSubscriptions: CollectionConfig = {
   labels: { singular: 'User Subscription', plural: 'User Subscriptions' },
   admin: {
     useAsTitle: 'id',
-    group: 'Subscriptions',
+    group: 'Users',
     defaultColumns: ['user', 'product', 'lifecycleState', 'startDate', 'endDate', 'environment'],
   },
   access: { read: authenticated, create: authenticated, update: authenticated, delete: () => false },

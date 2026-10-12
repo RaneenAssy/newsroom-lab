@@ -8,9 +8,9 @@ import { AUDIT_ACTIONS } from '../audit/articleAudit'
  */
 export const ArticleAuditLogs: CollectionConfig = {
   slug: 'article-audit-logs',
-  labels: { singular: 'Audit Log Entry', plural: 'Audit Logs' },
+  labels: { singular: 'Audit Log Entry', plural: 'News Audit Logs' },
   admin: {
-    group: 'News',
+    group: 'News Management',
     useAsTitle: 'articleTitle',
     defaultColumns: ['createdAt', 'articleTitle', 'action', 'actionBy', 'isSystemAction', 'articleLang'],
     listSearchableFields: ['articleTitle', 'articleSlug', 'articleId'],

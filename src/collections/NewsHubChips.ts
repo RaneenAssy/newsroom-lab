@@ -5,7 +5,7 @@ import { hasPermission } from '../access'
 export const NewsHubChips: CollectionConfig = {
   slug: 'news-hub-chips',
   labels: { singular: 'News Hub Chip', plural: 'News Hub Chips' },
-  admin: { useAsTitle: 'key', group: 'News', defaultColumns: ['chipKind', 'key', 'visible', 'sortOrder'] },
+  admin: { useAsTitle: 'key', group: 'News Management', defaultColumns: ['chipKind', 'key', 'visible', 'sortOrder'] },
   defaultSort: 'sortOrder',
   access: {
     read: hasPermission('view_all_news_categories'),
